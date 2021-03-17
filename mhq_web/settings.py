@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mhqDB',
         'USER': 'mhq',
-        'PASSWORD': 'root',
+        'PASSWORD': config('DB_PASS', default='root'),
         'HOST': 'localhost',
     }
 }
