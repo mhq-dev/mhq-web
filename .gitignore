@@ -2,8 +2,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/django,pycharm,venv,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,pycharm,venv,python
 
-### secret_codes ####
-secret_code.py
+### secret codes ###
+*.env
 
 ### Django ###
 *.log
