@@ -1,6 +1,5 @@
 from django.db import models
-from rest_framework.authtoken.admin import User
-# from authentication.models import User
+from authentication.models import User
 
 
 class Collection(models.Model):
@@ -19,6 +18,9 @@ class Collection(models.Model):
     def get_scenarios(self):
         pass
 
+    class Meta:
+        db_table = 'collections'
+
 
 class UserCollection(models.Model):
     OWNER = 'owner'
@@ -27,3 +29,6 @@ class UserCollection(models.Model):
     role = models.CharField(max_length=255, default=VISITOR)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'user_collections'
