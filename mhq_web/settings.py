@@ -138,7 +138,7 @@ DJOSER = {
     }
 }
 
-secret_key_gmail = config('SECRET_KEY')
+secret_key_gmail = config('SECRET_KEY', default='nothing')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
