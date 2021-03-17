@@ -3,8 +3,7 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin
 
 
 class User(AbstractUser):
-    name = models.CharField(max_length=255, default=None)
-    REQUIRED_FIELDS = ['email', 'name']
+    REQUIRED_FIELDS = ['email', ]
 
     class Meta:
         db_table = 'users'
