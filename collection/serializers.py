@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from collection.models import Collection, UserCollection
+from request.models import Request
 
 
 class UserCollectionSerializer(serializers.ModelSerializer):
@@ -11,9 +12,22 @@ class UserCollectionSerializer(serializers.ModelSerializer):
         fields = ['user', 'role']
 
 
-class CollectionSerializer(serializers.ModelSerializer):
+class RequestLiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Request
+        fields = ['name', 'http_method']
+
+
+class CollectionFullSerializer(serializers.ModelSerializer):
     users = UserCollectionSerializer(source='get_user_collections', many=True, read_only=True)
+    requests = RequestLiteSerializer(source='get_requests', many=True, read_only=True)
 
     class Meta:
         model = Collection
-        fields = ['id', 'type', 'name', 'users']
+        fields = ['id', 'type', 'name', 'users', 'requests']
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = '__all__'

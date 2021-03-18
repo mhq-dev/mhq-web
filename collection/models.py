@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from request.models import Request
 
 
 class Collection(models.Model):
@@ -13,7 +14,7 @@ class Collection(models.Model):
         return UserCollection.objects.all().filter(collection__id=self.id)
 
     def get_requests(self):
-        pass
+        return Request.objects.all().filter(collection__id=self.id)
 
     def get_scenarios(self):
         pass

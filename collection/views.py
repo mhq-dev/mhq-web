@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 
 from collection.models import Collection, UserCollection
-from collection.serializers import CollectionSerializer
+from collection.serializers import CollectionFullSerializer, CollectionSerializer
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -17,4 +17,4 @@ class CollectionViewSet(viewsets.ModelViewSet):
         collections = []
         for user_collection in user_collections:
             collections.append(user_collection.collection)
-        return JsonResponse(CollectionSerializer(collections, many=True).data, safe=False)
+        return JsonResponse(CollectionFullSerializer(collections, many=True).data, safe=False)
