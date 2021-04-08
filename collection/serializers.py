@@ -25,9 +25,3 @@ class CollectionFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = ['id', 'type', 'name', 'users', 'requests']
-
-
-class CollectionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Collection
-        fields = '__all__'

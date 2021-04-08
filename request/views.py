@@ -1,6 +1,8 @@
+from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import viewsets
 
+from collection.models import Collection
 from request.models import Request
 from request.serializers import RequestFullSerializer, RequestSerializer
 
@@ -9,7 +11,8 @@ class RequestViewSet(viewsets.ModelViewSet):
     serializer_class = RequestSerializer
 
     def get_queryset(self):
-        return Request.objects.all()
+        return Request.objects.all().filter(Q(collection__type=Collection.PUBLIC)
+                                            | Q(collection__usercollection__user=self.request.user))
 
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')

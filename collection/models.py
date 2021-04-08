@@ -25,6 +25,7 @@ class Collection(models.Model):
 
 class UserCollection(models.Model):
     OWNER = 'owner'
+    EDITOR = 'editor'
     VISITOR = 'visitor'
 
     role = models.CharField(max_length=255, default=VISITOR)
