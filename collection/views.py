@@ -13,8 +13,8 @@ class CollectionViewSet(viewsets.ModelViewSet):
         return Collection.objects.all().filter(Q(type=Collection.PUBLIC) | Q(usercollection__user=self.request.user))
 
     def list(self, request, *args, **kwargs):
-        username = kwargs.get('username')
-        user_collections = UserCollection.objects.all().filter(user__username=username)
+        user_id = kwargs.get('user_id')
+        user_collections = UserCollection.objects.all().filter(user__id=user_id)
         collections = []
         for user_collection in user_collections:
             collections.append(user_collection.collection)

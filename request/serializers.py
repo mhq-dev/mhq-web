@@ -7,7 +7,7 @@ from request.models import Request
 class CollectionLiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = ['name', 'type']
+        fields = ['id', 'name', 'type']
 
 
 class RequestFullSerializer(serializers.ModelSerializer):
@@ -16,9 +16,3 @@ class RequestFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = ['id', 'name', 'http_method', 'url', 'body', 'collection']
-
-
-class RequestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Request
-        fields = '__all__'

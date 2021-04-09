@@ -9,13 +9,13 @@ class UserCollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserCollection
-        fields = ['user', 'role']
+        fields = ['id', 'user', 'role']
 
 
 class RequestLiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
-        fields = ['name', 'http_method']
+        fields = ['id', 'name', 'http_method']
 
 
 class CollectionFullSerializer(serializers.ModelSerializer):

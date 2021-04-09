@@ -4,11 +4,11 @@ from rest_framework import viewsets
 
 from collection.models import Collection
 from request.models import Request
-from request.serializers import RequestFullSerializer, RequestSerializer
+from request.serializers import RequestFullSerializer
 
 
 class RequestViewSet(viewsets.ModelViewSet):
-    serializer_class = RequestSerializer
+    serializer_class = RequestFullSerializer
 
     def get_queryset(self):
         return Request.objects.all().filter(Q(collection__type=Collection.PUBLIC)
