@@ -1,6 +1,8 @@
-from django.urls import path, include
+from django.urls import path
+
+from authentication.viewsets import *
 
 urlpatterns = [
-    path('/', include('djoser.urls')),
-    path('/', include('djoser.urls.authtoken')),
+    path('profile/<int:pk>/', get_user_profile),
+    path('profile/update/', update_user_profile)
 ]
