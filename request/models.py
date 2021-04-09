@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Request(models.Model):
+    # TODO add permission for methods
     GET = 'get'
     POST = 'post'
     PUT = 'put'

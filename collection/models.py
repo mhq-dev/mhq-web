@@ -4,6 +4,7 @@ from request.models import Request
 
 
 class Collection(models.Model):
+    # TODO add permission for types
     PRIVATE = 'private'
     PUBLIC = 'public'
 
@@ -24,6 +25,7 @@ class Collection(models.Model):
 
 
 class UserCollection(models.Model):
+    # TODO add permission for roles
     OWNER = 'owner'
     EDITOR = 'editor'
     VISITOR = 'visitor'
