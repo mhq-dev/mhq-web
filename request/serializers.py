@@ -5,13 +5,18 @@ from request.models import Request
 
 
 class CollectionLiteSerializer(serializers.ModelSerializer):
+
+    def to_internal_value(self, data):
+        return Collection.objects.get(pk=data)
+
     class Meta:
         model = Collection
         fields = ['id', 'name', 'type']
+        read_only_fields = ['name', 'type']
 
 
 class RequestFullSerializer(serializers.ModelSerializer):
-    collection = CollectionLiteSerializer(read_only=True)
+    collection = CollectionLiteSerializer(required=False)
 
     class Meta:
         model = Request
