@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -12,6 +13,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return User.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = get_object_or_404(User, username=kwargs.get('username'))
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
         instance = request.user
