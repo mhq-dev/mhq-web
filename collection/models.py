@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from request.models import Request
 
 
 class Collection(models.Model):
@@ -7,13 +8,13 @@ class Collection(models.Model):
     PUBLIC = 'public'
 
     type = models.CharField(max_length=255, default=PUBLIC)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def get_user_collections(self):
         return UserCollection.objects.all().filter(collection__id=self.id)
 
     def get_requests(self):
-        pass
+        return Request.objects.all().filter(collection__id=self.id)
 
     def get_scenarios(self):
         pass
@@ -24,6 +25,7 @@ class Collection(models.Model):
 
 class UserCollection(models.Model):
     OWNER = 'owner'
+    EDITOR = 'editor'
     VISITOR = 'visitor'
 
     role = models.CharField(max_length=255, default=VISITOR)
@@ -32,3 +34,4 @@ class UserCollection(models.Model):
 
     class Meta:
         db_table = 'user_collections'
+        unique_together = ('user', 'collection', )

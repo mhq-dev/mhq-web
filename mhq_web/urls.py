@@ -25,7 +25,9 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
     path('api/auth/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.authtoken')),
-    path('api/', include('collection.urls')),
+    path('api/collection/', include('collection.urls')),
+    path('api/request/', include('request.urls')),
     path('api/user/', include('authentication.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
