@@ -15,7 +15,7 @@ class RequestViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Request.objects.all().filter(Q(collection__type=Collection.PUBLIC)
-                                            | Q(collection__usercollection__user=self.request.user))
+                                            | Q(collection__usercollection__user=self.request.user)).distinct()
 
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')

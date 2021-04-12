@@ -24,5 +24,5 @@ class RequestFullSerializer(serializers.ModelSerializer):
 
     def validate_http_method(self, http_method):
         if http_method not in [Request.GET, Request.POST, Request.PUT, Request.DELETE]:
-            raise serializers.ValidationError("you're http method is not valid")
+            raise serializers.ValidationError("your http method is not valid!")
         return http_method

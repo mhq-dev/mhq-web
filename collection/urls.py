@@ -6,8 +6,8 @@ urlpatterns = [
     path('user/<str:username>/', collection_list),
     path('', collection_create),
     path('<int:pk>/', collection_detail),
-    path('add_user/', collection_add_user),
-    path('remove_user/', collection_remove_user),
-    path('promote_user/', collection_promote_user),
-    path('left/', collection_left)
+    path('<int:pk>/add_user/<str:username>', collection_add_user),
+    path('<int:pk>/remove_user/<str:username>', collection_remove_user),
+    path('<int:pk>/promote_user/<str:username>', collection_promote_user),
+    path('<int:pk>/left/', collection_left)
 ]
