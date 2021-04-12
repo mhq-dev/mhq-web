@@ -1,8 +1,7 @@
 from django.db.models import Q
 from django.http import JsonResponse
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
 
 from collection.models import Collection
 from request.models import Request
