@@ -21,3 +21,8 @@ class RequestFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = ['id', 'name', 'http_method', 'url', 'body', 'collection']
+
+    def validate_http_method(self, http_method):
+        if http_method not in [Request.GET, Request.POST, Request.PUT, Request.DELETE]:
+            raise serializers.ValidationError("you're http method is not valid")
+        return http_method

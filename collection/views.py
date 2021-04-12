@@ -6,11 +6,13 @@ from rest_framework.response import Response
 
 from authentication.models import User
 from collection.models import Collection, UserCollection
-from collection.serializers import CollectionFullSerializer
+from collection.permissions import CollectionPermission, has_add_user_permission, has_remove_or_promote_user_permission
+from collection.serializers import CollectionFullSerializer, UserCollectionSerializer
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
     serializer_class = CollectionFullSerializer
+    permission_classes = [CollectionPermission, ]
 
     def get_queryset(self):
         return Collection.objects.all().filter(Q(type=Collection.PUBLIC) | Q(usercollection__user=self.request.user))
@@ -33,18 +35,55 @@ class CollectionViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def add_user(self, request, *args, **kwargs):
-        username = kwargs.get('username')
-        collection_id = kwargs.get('collection_id')
-        role = kwargs.get('role')
-
+    def add_user(self, request):
+        username = request.data['username']
+        collection_id = request.data['collection_id']
+        role = request.data['role']
         user = get_object_or_404(User, username=username)
         collection = get_object_or_404(Collection, id=collection_id)
+        role = UserCollectionSerializer().validate_role(role)
+        self.check_add_user_permission(request, UserCollection.objects.get(user=request.user, collection=collection))
         UserCollection.objects.create(user=user, role=role, collection=collection).save()
         return Response({'msg': 'added successfully'}, status=status.HTTP_200_OK)
 
-    def remove_user(self, request, *args, **kwargs):
-        username = kwargs.get('username')
-        collection_id = kwargs.get('collection_id')
-        UserCollection.objects.get(user__username=username, collection__id=collection_id).save()
+    def check_add_user_permission(self, request, applicant_user_collection):
+        if not has_add_user_permission(applicant_user_collection):
+            self.permission_denied(request, message='You are not allowed to add new users!')
+
+    def remove_user(self, request):
+        username = request.data['username']
+        collection_id = request.data['collection_id']
+        user = get_object_or_404(User, username=username)
+        collection = get_object_or_404(Collection, id=collection_id)
+        self.check_remove_or_promote_user_permission(request,
+                                                     UserCollection.objects.get(user=request.user,
+                                                                                collection=collection),
+                                                     UserCollection.objects.get(user=user, collection=collection))
+        UserCollection.objects.get(user=user, collection=collection).delete()
         return Response({'msg': 'removed successfully'}, status=status.HTTP_200_OK)
+
+    def promote_user(self, request):
+        username = request.data['username']
+        collection_id = request.data['collection_id']
+        role = request.data['role']
+        user = get_object_or_404(User, username=username)
+        collection = get_object_or_404(Collection, id=collection_id)
+        role = UserCollectionSerializer().validate_role(role)
+        self.check_remove_or_promote_user_permission(request,
+                                                     UserCollection.objects.get(user=request.user,
+                                                                                collection=collection),
+                                                     UserCollection.objects.get(user=user, collection=collection))
+        user_collection = UserCollection.objects.get(user=user, collection=collection)
+        user_collection.role = role
+        user_collection.save()
+        return Response({'msg': 'promoted successfully'}, status=status.HTTP_200_OK)
+
+    def check_remove_or_promote_user_permission(self, request, applicant_user_collection, requested_user_collection):
+        if not has_remove_or_promote_user_permission(applicant_user_collection, requested_user_collection):
+            self.permission_denied(request, message='You are not allowed to remove or promote this users!')
+
+    def left(self, request):
+        collection_id = request.data['collection_id']
+        collection = get_object_or_404(Collection, id=collection_id)
+        UserCollection.objects.get(user=request.user, collection=collection).delete()
+        return Response({'msg': 'left successfully'}, status=status.HTTP_200_OK)

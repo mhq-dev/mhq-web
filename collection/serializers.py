@@ -11,6 +11,11 @@ class UserCollectionSerializer(serializers.ModelSerializer):
         model = UserCollection
         fields = ['id', 'user', 'role']
 
+    def validate_role(self, role):
+        if role not in [UserCollection.OWNER, UserCollection.EDITOR, UserCollection.VISITOR]:
+            raise serializers.ValidationError("you're collection type is not valid")
+        return role
+
 
 class RequestLiteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +30,8 @@ class CollectionFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
         fields = ['id', 'type', 'name', 'users', 'requests']
+
+    def validate_type(self, type):
+        if type not in [Collection.PUBLIC, Collection.PRIVATE]:
+            raise serializers.ValidationError("you're collection type is not valid")
+        return type
