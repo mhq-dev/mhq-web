@@ -12,7 +12,7 @@ class RequestPermission(permissions.BasePermission):
                 return False
         else:
             user_collection = UserCollection.objects.filter(user=request.user, collection=obj.collection)
-            if len(user_collection) != 1 or user_collection.role == UserCollection.VISITOR:
+            if len(user_collection) != 1 or user_collection[0].role == UserCollection.VISITOR:
                 return False
 
         return True
@@ -21,7 +21,7 @@ class RequestPermission(permissions.BasePermission):
         if request.method == 'POST':
             user_collection = UserCollection.objects.filter(user=request.user,
                                                             collection__id=request.data['collection'])
-            if len(user_collection) != 1 or user_collection.role == UserCollection.VISITOR:
+            if len(user_collection) != 1 or user_collection[0].role == UserCollection.VISITOR:
                 return False
 
         return True

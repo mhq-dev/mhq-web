@@ -7,13 +7,13 @@ class CollectionPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method == 'DELETE':
-            user_collection = UserCollection.objects.get(user=request.user, collection=obj)
-            if user_collection.role != UserCollection.OWNER:
+            user_collection = UserCollection.objects.filter(user=request.user, collection=obj)
+            if len(user_collection) != 1 or user_collection[0].role != UserCollection.OWNER:
                 return False
 
         if request.method == 'PUT':
-            user_collection = UserCollection.objects.get(user=request.user, collection=obj)
-            if user_collection.role == UserCollection.VISITOR:
+            user_collection = UserCollection.objects.filter(user=request.user, collection=obj)
+            if len(user_collection) != 1 or user_collection.role == UserCollection.VISITOR:
                 return False
         return True
 
