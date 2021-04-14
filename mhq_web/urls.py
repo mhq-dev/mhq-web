@@ -6,12 +6,12 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="MHQ",
-      default_version='v1',
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="MHQ",
+        default_version='v1',
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
@@ -22,5 +22,7 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
     path('api/', include('collection.urls')),
     path('api/auth', include('authentication.urls')),
+
+    path('api/collections/scenario/', include('scenario.urls')),
 
 ]
