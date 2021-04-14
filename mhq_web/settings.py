@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'collection',
-    'request'
+    'request',
+    'scenario',
 ]
 
 MIDDLEWARE = [
