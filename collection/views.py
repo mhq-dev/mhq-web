@@ -85,7 +85,7 @@ class CollectionViewSet(viewsets.ModelViewSet):
         if not has_remove_or_promote_user_permission(applicant_user_collection, requested_user_collection):
             self.permission_denied(request, message='You are not allowed to remove or promote this users!')
 
-    def left(self, request, *args, **kwargs):
-        collection = self.get_object()
+    def left(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk)
         UserCollection.objects.get(user=request.user, collection=collection).delete()
         return Response({'msg': 'left successfully'}, status=status.HTTP_200_OK)
