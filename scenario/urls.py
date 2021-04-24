@@ -1,0 +1,8 @@
+from django.urls import path
+from . import viewsets
+
+urlpatterns = [
+    path('collection/<int:collection_id>/', viewsets.scenarios_list),
+    path('create_scenario', viewsets.create_scenario),
+    path('<int:pk>/', viewsets.scenario_detail),
+]
