@@ -1,26 +1,23 @@
-from django.shortcuts import render
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated
 from .serializers import ScenarioSerializer
 from rest_framework import viewsets, status
 from .models import Scenario
-from collection.models import UserCollection
+from collection.models import Collection
+from django.db.models import Q
+from rest_framework.generics import get_object_or_404
+from .permissions import ScenarioPermission
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
     serializer_class = ScenarioSerializer
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [ScenarioPermission, ]
 
     def get_queryset(self):
-        return Scenario.objects.all()
+        return Scenario.objects.all().filter(Q(collection__type=Collection.PUBLIC)
+                                             | Q(collection__usercollection__user=self.request.user)).distinct()
 
     def list(self, request, *args, **kwargs):
-        collection_id = kwargs['id']
-        username = kwargs['username']
-        if collection_id is None or username is None:
-            return JsonResponse({'error ': 'give me the username and collection id'},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        u = UserCollection.objects.filter(user=request.user, collection_id=id).first()
-        obj = self.get_queryset().get(collection=u.collection)
-        return JsonResponse(ScenarioSerializer(obj).data, safe=False, status=status.HTTP_200_OK)
+        collection_id = kwargs.get('collection_id')
+        collection = get_object_or_404(Collection, id=collection_id)
+        scenarios = Scenario.objects.filter(collection=collection)
+        return JsonResponse(ScenarioSerializer(scenarios, many=True).data, safe=False, status=status.HTTP_200_OK)
