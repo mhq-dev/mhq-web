@@ -13,3 +13,7 @@ request_detail = RequestViewSet.as_view({
     'delete': 'destroy',
     'put': 'update',
 })
+
+request_execute = RequestViewSet.as_view({
+    'get': 'execute',
+})
