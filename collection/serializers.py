@@ -6,10 +6,11 @@ from request.models import Request
 
 class UserCollectionSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source='user.username', read_only=True)
+    avatar = serializers.ImageField(source='user.avatar', read_only=True, use_url=True)
 
     class Meta:
         model = UserCollection
-        fields = ['id', 'user', 'role']
+        fields = ['id', 'user', 'avatar', 'role']
 
     def validate_role(self, role):
         if role not in [UserCollection.OWNER, UserCollection.EDITOR, UserCollection.VISITOR]:
