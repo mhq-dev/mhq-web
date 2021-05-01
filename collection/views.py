@@ -15,12 +15,16 @@ class CollectionViewSet(viewsets.ModelViewSet):
     permission_classes = [CollectionPermission, ]
 
     def get_queryset(self):
-        return Collection.objects.all().filter(Q(type=Collection.PUBLIC)
-                                               | Q(usercollection__user=self.request.user)).distinct()
+        if self.request.user.is_authenticated:
+            return Collection.objects.all().filter(Q(type=Collection.PUBLIC)
+                                                   | Q(usercollection__user=self.request.user)).distinct()
+        return Collection.objects.all().filter(Q(type=Collection.PUBLIC))
 
     def get_user_collection_queryset(self):
-        return UserCollection.objects.all().filter(Q(collection__type=Collection.PUBLIC)
-                                                   | Q(collection__usercollection__user=self.request.user))
+        if self.request.user.is_authenticated:
+            return UserCollection.objects.all().filter(Q(collection__type=Collection.PUBLIC)
+                                                       | Q(collection__usercollection__user=self.request.user))
+        return UserCollection.objects.all().filter(Q(collection__type=Collection.PUBLIC))
 
     def list(self, request, *args, **kwargs):
         username = kwargs.get('username')
@@ -85,7 +89,7 @@ class CollectionViewSet(viewsets.ModelViewSet):
         if not has_remove_or_promote_user_permission(applicant_user_collection, requested_user_collection):
             self.permission_denied(request, message='You are not allowed to remove or promote this users!')
 
-    def left(self, request, *args, **kwargs):
-        collection = self.get_object()
+    def left(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk)
         UserCollection.objects.get(user=request.user, collection=collection).delete()
         return Response({'msg': 'left successfully'}, status=status.HTTP_200_OK)
