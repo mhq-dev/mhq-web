@@ -48,9 +48,9 @@ INSTALLED_APPS = [
     'collection',
     'request',
     'scenario',
-    # 'edge',
-    # 'module',
-    # 'condition',
+    'edge',
+    'module',
+    'condition',
 ]
 
 MIDDLEWARE = [
