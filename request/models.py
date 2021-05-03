@@ -13,5 +13,29 @@ class Request(models.Model):
     url = models.CharField(max_length=255, blank=True)
     body = models.JSONField(null=True, blank=True)
 
+    def get_headers(self):
+        return KeyValueContainer.objects.all().filter(request__id=self.id, type=KeyValueContainer.HEADER)
+
+    def get_params(self):
+        return KeyValueContainer.objects.all().filter(request__id=self.id, type=KeyValueContainer.PARAM)
+
+    def get_form_data(self):
+        pass
+
     class Meta:
         db_table = 'requests'
+
+
+class KeyValueContainer(models.Model):
+    HEADER = 'header'
+    PARAM = 'param'
+
+    # TODO add form data
+    # FORM_DATA = 'form-data'
+
+    type = models.CharField(max_length=255, default=HEADER)
+    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    enable = models.BooleanField(default=True)
+    key = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, null=True)

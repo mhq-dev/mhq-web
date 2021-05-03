@@ -16,12 +16,3 @@ class RequestPermission(permissions.BasePermission):
                 return False
 
         return True
-
-    def has_permission(self, request, view):
-        if request.method == 'POST':
-            user_collection = UserCollection.objects.filter(user=request.user,
-                                                            collection__id=request.data['collection'])
-            if len(user_collection) != 1 or user_collection[0].role == UserCollection.VISITOR:
-                return False
-
-        return True

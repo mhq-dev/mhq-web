@@ -15,12 +15,16 @@ class CollectionViewSet(viewsets.ModelViewSet):
     permission_classes = [CollectionPermission, ]
 
     def get_queryset(self):
-        return Collection.objects.all().filter(Q(type=Collection.PUBLIC)
-                                               | Q(usercollection__user=self.request.user)).distinct()
+        if self.request.user.is_authenticated:
+            return Collection.objects.all().filter(Q(type=Collection.PUBLIC)
+                                                   | Q(usercollection__user=self.request.user)).distinct()
+        return Collection.objects.all().filter(Q(type=Collection.PUBLIC))
 
     def get_user_collection_queryset(self):
-        return UserCollection.objects.all().filter(Q(collection__type=Collection.PUBLIC)
-                                                   | Q(collection__usercollection__user=self.request.user))
+        if self.request.user.is_authenticated:
+            return UserCollection.objects.all().filter(Q(collection__type=Collection.PUBLIC)
+                                                       | Q(collection__usercollection__user=self.request.user))
+        return UserCollection.objects.all().filter(Q(collection__type=Collection.PUBLIC))
 
     def list(self, request, *args, **kwargs):
         username = kwargs.get('username')
