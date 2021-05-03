@@ -2,7 +2,7 @@
 FROM python:3.7.10-alpine
 
 # set work directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/mhq_web
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
