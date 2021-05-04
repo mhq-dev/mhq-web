@@ -23,7 +23,7 @@ app.conf.beat_schedule = {
     'add-every-30-seconds': {
         'task': 'tasks.test',
         'schedule': 30.0,
-        'args': 16
+        'args': (16,)
     },
 }
 
