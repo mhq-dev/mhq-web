@@ -19,6 +19,14 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
+app.conf.beat_schedule = {
+    'add-every-30-seconds': {
+        'task': 'tasks.test',
+        'schedule': 30.0,
+        'args': 16
+    },
+}
+
 
 @app.task(bind=True)
 def debug_task(self):
