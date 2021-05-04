@@ -35,8 +35,8 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # Executes every Monday morning at 7:30 a.m.
     sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=0),
-        test.s('day of week 0 hour 10:10'),
+        crontab(hour=15, minute=3, day_of_week=1),
+        test.s('fuuuuuccckkkk yoooouuuu'),
     )
 
 
