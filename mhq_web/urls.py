@@ -7,7 +7,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from mhq_web import settings
-from mhq_web.celery import test_celery
+from mhq_web.views import test_celery
 
 schema_view = get_schema_view(
    openapi.Info(

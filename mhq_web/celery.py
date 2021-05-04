@@ -5,9 +5,6 @@ from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
 from celery.schedules import crontab
-from django.http import HttpResponse
-from requests import Response
-from rest_framework.decorators import api_view
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mhq_web.settings')
 
@@ -45,7 +42,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
 
 @app.task
-def test():
+def test_task():
     dt_string = crontab().now().strftime("%d/%m/%Y %H:%M:%S")
     print('fuck')
     print("date and time =", dt_string)
@@ -61,10 +58,3 @@ def test():
 # }
 
 #
-@api_view(['GET'])
-def test_celery(request):
-    test.delay()
-    test.delay()
-    test.delay()
-    test.delay()
-    return HttpResponse()
