@@ -7,7 +7,7 @@ from celery import Celery
 from celery.schedules import crontab
 from django.http import HttpResponse
 from requests import Response
-# from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mhq_web.settings')
 
@@ -61,7 +61,10 @@ def test():
 # }
 
 #
-# @api_view(['GET'])
-# def test_celery(request):
-#     print('hi')
-#     return HttpResponse()
+@api_view(['GET'])
+def test_celery(request):
+    test.delay()
+    test.delay()
+    test.delay()
+    test.delay()
+    return HttpResponse()
