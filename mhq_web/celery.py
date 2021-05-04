@@ -1,4 +1,5 @@
 import os
+from calendar import calendar
 
 from celery import Celery
 
@@ -44,3 +45,4 @@ def test(arg):
     dt_string = crontab().now().strftime("%d/%m/%Y %H:%M:%S")
     print(arg)
     print("date and time =", dt_string)
+    print('weekday: ', crontab().now().weekday(), calendar.day_name[crontab().now().weekday()])
