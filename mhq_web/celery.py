@@ -37,74 +37,10 @@ def setup_periodic_tasks(sender, **kwargs):
         crontab(hour=10, minute=10, day_of_week=0),
         test.s('day of week 0 hour 10:10'),
     )
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=1),
-        test.s('day of week 1 hour 10:10'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=2),
-        test.s('day of week 2 hour 10:10'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=3),
-        test.s('day of week 3 hour 10:10'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=4),
-        test.s('day of week 4 hour 10:10'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=5),
-        test.s('day of week 5 hour 10:10'),
-    )
-
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=6),
-        test.s('day of week 6 hour 10:10'),
-    )
-
-    sender.add_periodic_task(
-        crontab(hour=10, minute=10, day_of_week=7),
-        test.s('day of week 7 hour 10:10'),
-    )
-
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=0),
-        test.s('day of week 0 hour 14:40'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=1),
-        test.s('day of week 1 hour 14:40'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=2),
-        test.s('day of week 2 hour 14:40'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=3),
-        test.s('day of week 3 hour 14:40'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=4),
-        test.s('day of week 4 hour 14:40'),
-    )
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=5),
-        test.s('day of week 5 hour 14:40'),
-    )
-
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=6),
-        test.s('day of week 6 hour 14:40'),
-    )
-
-    sender.add_periodic_task(
-        crontab(hour=14, minute=40, day_of_week=7),
-        test.s('day of week 7 hour 14:40'),
-    )
-
 
 
 @app.task
 def test(arg):
+    dt_string = crontab().now().strftime("%d/%m/%Y %H:%M:%S")
     print(arg)
+    print("date and time =", dt_string)
