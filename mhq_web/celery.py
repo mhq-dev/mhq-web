@@ -34,12 +34,12 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # Executes every Monday morning at 7:30 a.m.
     sender.add_periodic_task(
-        crontab(hour=14, minute=20, day_of_week=3),
+        crontab(hour=9, minute=52, day_of_week=3),
         test.s('From Sunday!'),
     )
 
     sender.add_periodic_task(
-        crontab(hour=14, minute=20, day_of_week=4),
+        crontab(hour=14, minute=52, day_of_week=4),
         test.s('From Saturday!'),
     )
 
