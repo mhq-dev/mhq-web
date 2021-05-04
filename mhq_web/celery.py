@@ -1,5 +1,5 @@
+import calendar
 import os
-from calendar import calendar
 
 from celery import Celery
 
