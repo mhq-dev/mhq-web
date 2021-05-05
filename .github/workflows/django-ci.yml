@@ -23,7 +23,7 @@ jobs:
       postgres:
         image: postgres:10
         env:
-          POSTGRES_USER: mhqDB
+          POSTGRES_USER: mhq
           POSTGRES_PASSWORD: root
         options: >-
           --health-cmd pg_isready
