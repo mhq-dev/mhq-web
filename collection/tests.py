@@ -10,12 +10,12 @@ from collection.models import Collection, UserCollection
 class CollectionViewSetTestCase(APITestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(username="amirh", password="some-very-strong-psw-amirh")
+        self.user = User.objects.create_user(username="amirh")
         self.generate_basic_database()
         self.token = Token.objects.create(user=self.user)
 
     def generate_basic_database(self):
-        sadra = User.objects.create_user(username="sadra", password="some-very-strong-psw-sadra")
+        sadra = User.objects.create_user(username="sadra")
         self.col1 = Collection.objects.create(type='public', name='col1')
         UserCollection.objects.create(user=sadra, collection=self.col1, role=UserCollection.OWNER)
         self.col2 = Collection.objects.create(type='private', name='col2')
@@ -91,15 +91,15 @@ class CollectionViewSetTestCase(APITestCase):
 class UserCollectionViewSetTestCase(APITestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(username="amirh", password="some-very-strong-psw-amirh")
+        self.user = User.objects.create_user(username="amirh")
         self.generate_basic_database()
         self.token = Token.objects.create(user=self.user)
 
     def generate_basic_database(self):
-        sadra = User.objects.create_user(username='sadra', password="some-very-strong-psw-sadra")
-        owner_user = User.objects.create_user(username='owner_user', password='some-very-strong-psw-owner-user')
-        editor_user = User.objects.create_user(username='editor_user', password='some-very-strong-psw-editor-user')
-        visitor_user = User.objects.create_user(username='visitor_user', password='some-very-strong-psw-owner-visitor-user')
+        sadra = User.objects.create_user(username='sadra')
+        owner_user = User.objects.create_user(username='owner_user')
+        editor_user = User.objects.create_user(username='editor_user')
+        visitor_user = User.objects.create_user(username='visitor_user')
         self.col1 = Collection.objects.create(type='private', name='col1')
         UserCollection.objects.create(user=self.user, collection=self.col1, role=UserCollection.OWNER)
         UserCollection.objects.create(user=owner_user, collection=self.col1, role=UserCollection.OWNER)
