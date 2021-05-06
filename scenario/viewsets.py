@@ -9,7 +9,10 @@ create_scenario = ScenarioViewSets.as_view({
 })
 
 scenario_detail = ScenarioViewSets.as_view({
-    'get': 'retrieve',
     'delete': 'destroy',
     'put': 'update',
+})
+
+specific_scenario_edges = ScenarioViewSets.as_view({
+    'get': 'retrieve',
 })
