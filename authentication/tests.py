@@ -1,23 +1,15 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from .models import User
-from django.http.response import JsonResponse
-import json
 
 
 class AccountAPITestCase(APITestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(username='anonymous', password='test1234', email='test@gmail.com',
+        self.user = User.objects.create_user(username='anonymous', email='test@gmail.com',
                                              first_name='first', last_name='last')
         self.users = [User.objects.create_user(username='anonymous' + str(i), password=6 * 't') for i in range(5)]
-
-    def test_api_login(self):
-        response = self.client.post('http://localhost:8000/api/auth/token/login/',
-                                    {'username': 'anonymous', 'password': 'test1234'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_get_user_profile(self):
         # UNAUTHORIZED
@@ -29,9 +21,14 @@ class AccountAPITestCase(APITestCase):
         response = self.client.get(reverse('get_user_profile', kwargs={'username': 'anonymous'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_api_get_other_user_profile(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('get_user_profile', kwargs={'username': 'anonymous1'}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_api_update_profile(self):
         # UNAUTHORIZED
-        response = self.client.put(reverse('update_user_profile'), data={'first_name': 'ahmad'})
+        response = self.client.put(reverse('update_user_profile'), data={"first_name": "ahmad"})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # OK
@@ -54,10 +51,9 @@ class AccountAPITestCase(APITestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse('search_by_username', kwargs={"username": "anonymous"}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(json.loads(response.getvalue())), len(self.users) + 1)
+        self.assertEqual(len(response.json()), len(self.users) + 1)
 
         # ok
         response = self.client.get(reverse('search_by_username', kwargs={"username": "noname"}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(json.loads(response.getvalue())), 0)
-
+        self.assertEqual(len(response.json()), 0)
