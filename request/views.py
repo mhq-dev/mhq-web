@@ -28,10 +28,16 @@ class RequestViewSet(viewsets.ModelViewSet):
                                                 | Q(collection__usercollection__user=self.request.user)).distinct()
         return Request.objects.all().filter(Q(collection__type=Collection.PUBLIC))
 
+    def get_collection_queryset(self):
+        if self.request.user.is_authenticated:
+            return Collection.objects.all().filter(Q(type=Collection.PUBLIC)
+                                                   | Q(usercollection__user=self.request.user)).distinct()
+        return Collection.objects.all().filter(Q(type=Collection.PUBLIC))
+
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')
-        collection = get_object_or_404(Collection, id=collection_id)
-        mhq_requests = Request.objects.all().filter(collection=collection)
+        collection = get_object_or_404(self.get_collection_queryset(), id=collection_id)
+        mhq_requests = self.get_queryset().filter(collection=collection)
         return JsonResponse(RequestFullSerializer(mhq_requests, many=True).data, safe=False)
 
     def execute(self, request, pk):
