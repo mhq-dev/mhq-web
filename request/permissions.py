@@ -8,7 +8,7 @@ class RequestPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if view.action == 'update' or view.action == 'destroy':
             user_collection = UserCollection.objects.filter(user=request.user, collection=obj.collection)
-            if len(user_collection) != 1 or user_collection[0].role == UserCollection.VISITOR:
+            if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
                 return False
 
         return True
@@ -25,7 +25,7 @@ class RequestPermission(permissions.BasePermission):
 
             user_collection = UserCollection.objects.filter(user=request.user,
                                                             collection__id=request.data['collection'])
-            if len(user_collection) != 1 or user_collection[0].role == UserCollection.VISITOR:
+            if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
                 return False
 
         return True
