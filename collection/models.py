@@ -8,7 +8,7 @@ class Collection(models.Model):
     PUBLIC = 'public'
 
     type = models.CharField(max_length=255, default=PUBLIC, blank=True)
-    name = models.CharField(max_length=255, unique=True, blank=True)
+    name = models.CharField(max_length=255, unique=True)
 
     def get_user_collections(self):
         return UserCollection.objects.all().filter(collection__id=self.id)
