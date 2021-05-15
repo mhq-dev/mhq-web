@@ -1,7 +1,8 @@
 from django.urls import path
-from .viewsets import create_module, details_module
+from . import viewsets
 
 urlpatterns = [
-    path('', create_module),
-    path('<int:pk>/', details_module),
+    path('', viewsets.create_module),
+    path('<int:pk>/', viewsets.details_module),
+    path('request/<int:module_id>/', viewsets.module_complete_data),
 ]

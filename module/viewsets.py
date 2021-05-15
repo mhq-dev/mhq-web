@@ -7,5 +7,8 @@ create_module = ModuleViewSet.as_view({
 details_module = ModuleViewSet.as_view({
     'delete': 'destroy',
     'put': 'update',
+})
+
+module_complete_data = ModuleViewSet.as_view({
     'get': 'retrieve',
 })
