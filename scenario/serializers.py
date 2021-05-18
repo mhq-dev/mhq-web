@@ -29,7 +29,7 @@ class SpecificModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'x_position', 'y_position']
 
 
 class SpecificEdgeSerializer(serializers.ModelSerializer):
