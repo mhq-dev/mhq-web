@@ -16,8 +16,10 @@ class ScenarioViewSets(viewsets.ModelViewSet):
     permission_classes = [ScenarioPermission, ]
 
     def get_queryset(self):
-        return Scenario.objects.all().filter(Q(collection__type=Collection.PUBLIC)
-                                             | Q(collection__usercollection__user=self.request.user)).distinct()
+        if self.request.user.is_authenticated:
+            return Scenario.objects.all().filter(Q(collection__type=Collection.PUBLIC)
+                                                 | Q(collection__usercollection__user=self.request.user)).distinct()
+        return Scenario.objects.all().filter(collection__type=Collection.PUBLIC)
 
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')
@@ -32,6 +34,6 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         scenario = get_object_or_404(Scenario, collection=collection, id=scenario_id)
         edges = Edge.objects.all().filter(source__scenario=scenario)
         node_num = len(Module.objects.all().filter(scenario=scenario))
-        return JsonResponse({'node count': node_num,
+        return JsonResponse({'node_count': node_num,
                              'edges': SpecificEdgeSerializer(edges, many=True).data}, safe=False,
                             status=status.HTTP_200_OK)

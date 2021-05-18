@@ -28,4 +28,4 @@ class ModuleCompleteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'scenario', 'request']
+        fields = ['id', 'scenario', 'request', ]

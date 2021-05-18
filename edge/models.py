@@ -14,10 +14,3 @@ class Edge(models.Model):
 
     def get_dist(self):
         return self.dist
-
-# class Statement(models.Model):
-#     edge = models.ForeignKey('Edge', on_delete=models.CASCADE)
-#     name = models.CharField(max_length=100, blank=True)
-#
-#     class Meta:
-#         db_table = 'statements'
