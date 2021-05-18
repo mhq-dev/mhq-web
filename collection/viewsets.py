@@ -1,4 +1,4 @@
-from collection.views import CollectionViewSet
+from collection.views import CollectionViewSet, UserCollectionViewSet
 
 collection_list = CollectionViewSet.as_view({
     'get': 'list',
@@ -14,18 +14,18 @@ collection_detail = CollectionViewSet.as_view({
     'put': 'update',
 })
 
-collection_add_user = CollectionViewSet.as_view({
+user_collection_add = UserCollectionViewSet.as_view({
     'post': 'add_user',
 })
 
-collection_remove_user = CollectionViewSet.as_view({
+user_collection_remove = UserCollectionViewSet.as_view({
     'delete': 'remove_user',
 })
 
-collection_promote_user = CollectionViewSet.as_view({
+user_collection_promote = UserCollectionViewSet.as_view({
     'put': 'promote_user',
 })
 
-collection_left = CollectionViewSet.as_view({
+user_collection_left = UserCollectionViewSet.as_view({
     'delete': 'left',
 })

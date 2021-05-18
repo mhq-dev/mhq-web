@@ -2,12 +2,13 @@ from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from authentication.models import User
 from collection.models import Collection, UserCollection
 from collection.permissions import CollectionPermission, has_add_user_permission, has_remove_or_promote_user_permission
-from collection.serializers import CollectionFullSerializer, UserCollectionSerializer
+from collection.serializers import CollectionFullSerializer, UserCollectionSerializer, UserCollectionUpdateSerializer
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -45,51 +46,54 @@ class CollectionViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def add_user(self, request, *args, **kwargs):
-        username = kwargs.get('username')
+
+class UserCollectionViewSet(viewsets.GenericViewSet):
+    permission_classes = [CollectionPermission, IsAuthenticated, ]
+    serializer_class = UserCollectionSerializer
+    update_serializer_class = UserCollectionUpdateSerializer
+
+    def add_user(self, request, pk, username):
         role = request.data['role']
         user = get_object_or_404(User, username=username)
-        collection = self.get_object()
-        role = UserCollectionSerializer().validate_role(role)
-        self.check_add_user_permission(request, UserCollection.objects.get(user=request.user, collection=collection))
-        UserCollection.objects.create(user=user, role=role, collection=collection).save()
-        return Response({'msg': 'added successfully'}, status=status.HTTP_200_OK)
+        collection = get_object_or_404(Collection, id=pk)
+        user_collection = get_object_or_404(UserCollection, user=request.user, collection=collection)
+        self.check_add_user_permission(request, user_collection)
+        serializer = self.update_serializer_class(data={'role': role, 'user': user.id, 'collection': collection.id})
+        serializer.is_valid(raise_exception=True)
+        x = serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def check_add_user_permission(self, request, applicant_user_collection):
         if not has_add_user_permission(applicant_user_collection):
             self.permission_denied(request, message='You are not allowed to add new users!')
 
-    def remove_user(self, request, *args, **kwargs):
-        username = kwargs.get('username')
+    def remove_user(self, request, pk, username):
         user = get_object_or_404(User, username=username)
-        collection = self.get_object()
-        self.check_remove_or_promote_user_permission(request,
-                                                     UserCollection.objects.get(user=request.user,
-                                                                                collection=collection),
-                                                     UserCollection.objects.get(user=user, collection=collection))
-        UserCollection.objects.get(user=user, collection=collection).delete()
+        collection = get_object_or_404(Collection, id=pk)
+        applicant_user_collection = get_object_or_404(UserCollection, user=request.user, collection=collection)
+        requested_user_collection = get_object_or_404(UserCollection, user=user, collection=collection)
+        self.check_remove_or_promote_permission(request, applicant_user_collection, requested_user_collection)
+        requested_user_collection.delete()
         return Response({'msg': 'removed successfully'}, status=status.HTTP_200_OK)
 
-    def promote_user(self, request, *args, **kwargs):
-        username = kwargs.get('username')
+    def promote_user(self, request, pk, username):
         role = request.data['role']
         user = get_object_or_404(User, username=username)
-        collection = self.get_object()
-        role = UserCollectionSerializer().validate_role(role)
-        self.check_remove_or_promote_user_permission(request,
-                                                     UserCollection.objects.get(user=request.user,
-                                                                                collection=collection),
-                                                     UserCollection.objects.get(user=user, collection=collection))
-        user_collection = UserCollection.objects.get(user=user, collection=collection)
-        user_collection.role = role
-        user_collection.save()
-        return Response({'msg': 'promoted successfully'}, status=status.HTTP_200_OK)
+        collection = get_object_or_404(Collection, id=pk)
+        applicant_user_collection = get_object_or_404(UserCollection, user=request.user, collection=collection)
+        requested_user_collection = get_object_or_404(UserCollection, user=user, collection=collection)
+        self.check_remove_or_promote_permission(request, applicant_user_collection, requested_user_collection)
+        serializer = self.update_serializer_class(instance=requested_user_collection,
+                                                  data={'role': role, 'user': user.id, 'collection': collection.id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def check_remove_or_promote_user_permission(self, request, applicant_user_collection, requested_user_collection):
+    def check_remove_or_promote_permission(self, request, applicant_user_collection, requested_user_collection):
         if not has_remove_or_promote_user_permission(applicant_user_collection, requested_user_collection):
             self.permission_denied(request, message='You are not allowed to remove or promote this users!')
 
     def left(self, request, pk):
         collection = get_object_or_404(Collection, id=pk)
-        UserCollection.objects.get(user=request.user, collection=collection).delete()
+        get_object_or_404(UserCollection, user=request.user, collection=collection).delete()
         return Response({'msg': 'left successfully'}, status=status.HTTP_200_OK)
