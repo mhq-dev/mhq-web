@@ -46,8 +46,8 @@ class RequestViewSet(viewsets.ModelViewSet):
         if mhq_request.http_method == Request.GET:
             try:
                 result = requests.get(mhq_request.url,
-                                      headers=get_key_value_dict(mhq_request.get_headers()),
-                                      params=get_key_value_dict(mhq_request.get_params())
+                                      headers=get_key_value_dict(mhq_request.get_enabled_headers()),
+                                      params=get_key_value_dict(mhq_request.get_enabled_params())
                                       )
             except:
                 return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -56,7 +56,7 @@ class RequestViewSet(viewsets.ModelViewSet):
             try:
                 result = requests.post(mhq_request.url,
                                        json=mhq_request.body,
-                                       headers=get_key_value_dict(mhq_request.get_headers())
+                                       headers=get_key_value_dict(mhq_request.get_enabled_headers())
                                        )
             except:
                 return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -65,16 +65,15 @@ class RequestViewSet(viewsets.ModelViewSet):
             try:
                 result = requests.put(mhq_request.url,
                                       data=mhq_request.body,
-                                      headers=get_key_value_dict(mhq_request.get_headers())
+                                      headers=get_key_value_dict(mhq_request.get_enabled_headers())
                                       )
             except:
                 return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
 
         if mhq_request.http_method == Request.DELETE:
             try:
-                print(get_key_value_dict(mhq_request.get_headers()))
                 result = requests.delete(mhq_request.url,
-                                         headers=get_key_value_dict(mhq_request.get_headers()))
+                                         headers=get_key_value_dict(mhq_request.get_enabled_headers()))
             except:
                 return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
 
