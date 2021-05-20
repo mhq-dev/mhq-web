@@ -22,5 +22,20 @@ class User(AbstractUser):
     class Meta:
         db_table = 'users'
 
+    def get_user_followers(self):
+        return UserFollow.objects.all().filter(followed=self)
+
+    def get_user_followings(self):
+        return UserFollow.objects.all().filter(follower=self)
+
     def __str__(self):
         return self.username
+
+
+class UserFollow(models.Model):
+    follower = models.ForeignKey('User', on_delete=models.CASCADE, related_name='follower')
+    followed = models.ForeignKey('User', on_delete=models.CASCADE, related_name='followed')
+
+    class Meta:
+        db_table = 'follows'
+        unique_together = ('follower', 'followed')

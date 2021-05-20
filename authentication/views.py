@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
-from authentication.models import User
-from authentication.serializer import UserProfileSerializer
+from authentication.models import User, UserFollow
+from authentication.serializer import UserProfileSerializer, UserFollowCreateSerializer, UserLiteSerializer
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -34,3 +34,23 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response({'msg': 'send something ...'}, status=status.HTTP_400_BAD_REQUEST)
         users = User.objects.all().filter(username__icontains=search_key)
         return JsonResponse(UserProfileSerializer(users, many=True).data, safe=False, status=status.HTTP_200_OK)
+
+    def get_user_followers(self, request, *args, **kwargs):
+        uname = request.get('username').lower()
+        user = get_object_or_404(User, username=uname)
+        return JsonResponse(UserLiteSerializer(user.get_user_followers(), many=True).data, safe=False,
+                            status=status.HTTP_200_OK)
+
+    def get_user_followings(self, request, *args, **kwargs):
+        uname = request.get('username').lower()
+        user = get_object_or_404(User, username=uname)
+        return JsonResponse(UserLiteSerializer(user.get_user_followings(), many=True).data, safe=False,
+                            status=status.HTTP_200_OK)
+
+
+class UserFollowViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = UserFollowCreateSerializer
+
+    def get_queryset(self):
+        return UserFollow.objects.all()
