@@ -89,11 +89,12 @@ WSGI_APPLICATION = 'mhq_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mhqDB',
-        'USER': 'mhq',
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DB_NAME', default='mhqDB'),
+        'USER': config('DB_USER', default='mhq'),
         'PASSWORD': config('DB_PASS', default='root'),
-        'HOST': 'localhost',
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
