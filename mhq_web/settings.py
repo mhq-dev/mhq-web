@@ -20,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", default='my_secret_key')
+SECRET_KEY = os.getenv("SECRET_KEY", default='my_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get('DEBUG', default=1))
+DEBUG = int(os.getenv('DEBUG', default=1))
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default='*').split(" ")
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", default='*').split(" ")
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
@@ -146,7 +146,7 @@ DJOSER = {
     }
 }
 
-secret_key_gmail = config('SECRET_KEY', default='nothing')
+secret_key_gmail = config('SECRET_KEY_GMAIL', default='nothing')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
