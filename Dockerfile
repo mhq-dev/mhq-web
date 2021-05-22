@@ -9,8 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies
-RUN apt update \
-    && apt install libpq-dev postgresql postgresql-contrib
+RUN apt-get update \
+    && apt-get install -y libpq-dev postgresql postgresql-contrib
 
 # install dependencies
 RUN pip install --upgrade pip
