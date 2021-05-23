@@ -349,4 +349,7 @@ pip-selfcheck.json
 infos.txt
 .env.dev
 
+ar-mhq-web-privatekey-putty.txt
+ar-mhq-web-privatekey.txt
+
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm,venv,python
