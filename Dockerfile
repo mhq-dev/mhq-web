@@ -2,7 +2,11 @@
 FROM python:3.7.10
 
 # set work directory
-WORKDIR /usr/src/app
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
+WORKDIR $APP_HOME
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
