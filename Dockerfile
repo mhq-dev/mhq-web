@@ -4,8 +4,10 @@ FROM python:3.7.10
 # set work directory
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
+RUN mkdir $HOME
 RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/static
+RUN mkdir $APP_HOME/media
 WORKDIR $APP_HOME
 
 # set environment variables
