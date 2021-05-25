@@ -1,5 +1,7 @@
 from django.db import models
 
+from authentication.models import User
+
 
 class Request(models.Model):
     GET = 'get'
@@ -45,3 +47,15 @@ class KeyValueContainer(models.Model):
     key = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True)
+
+
+class RequestHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    execution_time = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255, blank=True)
+    http_method = models.CharField(max_length=255, blank=True)
+    url = models.CharField(max_length=255, blank=True)
+    body = models.JSONField(null=True, blank=True)
+    headers = models.JSONField(null=True, blank=True)
+    params = models.JSONField(null=True, blank=True)
+    response = models.JSONField(null=True, blank=True)

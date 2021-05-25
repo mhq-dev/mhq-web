@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from collection.models import Collection
-from request.models import Request, KeyValueContainer
+from request.models import Request, KeyValueContainer, RequestHistory
 
 
 class CollectionLiteSerializer(serializers.ModelSerializer):
@@ -101,3 +101,11 @@ class RequestFullSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         instance.save()
         return instance
+
+
+class RequestHistorySerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = RequestHistory
+        fields = '__all__'

@@ -1,4 +1,4 @@
-from request.views import RequestViewSet
+from request.views import RequestViewSet, RequestHistoryViewSet
 
 request_list = RequestViewSet.as_view({
     'get': 'list',
@@ -16,4 +16,8 @@ request_detail = RequestViewSet.as_view({
 
 request_execute = RequestViewSet.as_view({
     'get': 'execute',
+})
+
+request_history_list = RequestHistoryViewSet.as_view({
+    'get': 'list',
 })
