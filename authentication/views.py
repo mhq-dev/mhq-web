@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
+from django.forms.models import model_to_dict
 from authentication.models import User, UserFollow
 from authentication.serializer import UserProfileSerializer, UserFollowCreateSerializer, UserLiteSerializer
 
@@ -35,13 +36,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         users = User.objects.all().filter(username__icontains=search_key)
         return JsonResponse(UserProfileSerializer(users, many=True).data, safe=False, status=status.HTTP_200_OK)
 
-    def get_user_followers(self, request, *args, **kwargs):
+    def get_followers(self, request, *args, **kwargs):
         uname = request.get('username').lower()
         user = get_object_or_404(User, username=uname)
         return JsonResponse(UserLiteSerializer(user.get_user_followers(), many=True).data, safe=False,
                             status=status.HTTP_200_OK)
 
-    def get_user_followings(self, request, *args, **kwargs):
+    def get_followings(self, request, *args, **kwargs):
         uname = request.get('username').lower()
         user = get_object_or_404(User, username=uname)
         return JsonResponse(UserLiteSerializer(user.get_user_followings(), many=True).data, safe=False,
@@ -49,8 +50,26 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 
 class UserFollowViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ]
     serializer_class = UserFollowCreateSerializer
+    permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
         return UserFollow.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        dist_username = kwargs.get('username')
+        dist_user = get_object_or_404(User, username=dist_username)
+        user_follow = UserFollow(follower_id=request.user.id, followed_id=dist_user.id)
+        print(model_to_dict(instance=user_follow))
+        serializer = UserFollowCreateSerializer(data=model_to_dict(user_follow))
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+        return Response({'msg': f'{serializer.errors}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        dist_user = get_object_or_404(User, username=username)
+        user_follow = get_object_or_404(UserFollow, follower=request.user, followed=dist_user)
+        user_follow.delete()
+        return Response({'msg': 'delete successfully'}, status=status.HTTP_200_OK)

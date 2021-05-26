@@ -20,10 +20,10 @@ user_unfollow = UserFollowViewSet.as_view({
     'delete': 'destroy'
 })
 
-user_get_following = UserFollowViewSet.as_view({
-    'get': 'get_user_followings'
+user_get_following = UserProfileViewSet.as_view({
+    'get': 'get_followings'
 })
 
 user_get_follower = UserProfileViewSet.as_view({
-    'get': 'get_user_followers'
+    'get': 'get_followers'
 })

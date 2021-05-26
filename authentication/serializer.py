@@ -18,15 +18,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserFollowCreateSerializer(serializers.ModelSerializer):
-    follower_uname = serializers.ModelSerializer(source='follower.username', read_only=True)
-    followed_uname = serializers.ModelSerializer(source='followed.username', read_only=True)
+    follower_uname = serializers.CharField(source='follower.username', read_only=True)
+    followed_uname = serializers.CharField(source='followed.username', read_only=True)
 
     class Meta:
         model = UserFollow
-        fields = ['follower_uname', 'followed_uname']
+        fields = ['follower_uname', 'followed_uname', ]
 
 
 class UserLiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'avatar', 'bio']
+        fields = ['username', 'avatar', 'bio', ]
