@@ -1,14 +1,16 @@
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 import requests
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from collection.models import Collection
-from request.models import Request
+from request.models import Request, RequestHistory
 from request.permissions import RequestPermission
-from request.serializers import RequestFullSerializer
+from request.serializers import RequestFullSerializer, RequestHistorySerializer
 
 
 def get_key_value_dict(key_values):
@@ -82,9 +84,45 @@ class RequestViewSet(viewsets.ModelViewSet):
         except ValueError:
             result_body = result.text
 
-        return Response({
+        mhq_response = {
             "status": result.status_code,
-            "headers": result.headers,
-            "cookies": result.cookies,
+            "headers": dict(result.headers),
+            "cookies": dict(result.cookies),
             "body": result_body,
-        }, status=status.HTTP_200_OK)
+        }
+
+        RequestHistory.objects.create(user=request.user,
+                                      name=mhq_request.name,
+                                      http_method=mhq_request.http_method,
+                                      url=mhq_request.url,
+                                      body=mhq_request.body,
+                                      headers=get_key_value_dict(mhq_request.get_headers()),
+                                      params=get_key_value_dict(mhq_request.get_params()),
+                                      response=mhq_response).save()
+
+        return Response(mhq_response, status=status.HTTP_200_OK)
+
+
+class RequestHistoryViewSet(viewsets.ModelViewSet):
+    serializer_class = RequestHistorySerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_queryset(self):
+        return RequestHistory.objects.all().filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = int(self.request.query_params.get('page'))
+        if page is None:
+            page = 1
+        limit = int(self.request.query_params.get('limit'))
+        if limit is None:
+            limit = 10
+
+        paginator = Paginator(queryset, limit)
+        if paginator.num_pages < page:
+            return Response({'msg': 'finished'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(paginator.get_page(page), many=True)
+        return Response(serializer.data)
