@@ -28,6 +28,10 @@ urlpatterns = [
     path('api/collection/', include('collection.urls')),
     path('api/request/', include('request.urls')),
     path('api/user/', include('authentication.urls')),
+    path('api/scenario/', include('scenario.urls')),
+    path('api/module/', include('module.urls')),
+    path('api/edge/', include('edge.urls')),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

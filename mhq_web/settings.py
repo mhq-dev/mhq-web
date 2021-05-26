@@ -20,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '2aq8a43j38qxj&*0iqtm5+f%2&$14l6yw*j2b1_icmb7&#a4s*'
+SECRET_KEY = os.environ.get("SECRET_KEY", default='my_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get('DEBUG', default=1))
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default='*').split(" ")
 CORS_ALLOW_ALL_ORIGINS = True
 
 # CELERY STUFF
@@ -59,6 +59,10 @@ INSTALLED_APPS = [
     'drf_yasg',
     'collection',
     'request',
+    'scenario',
+    'edge',
+    'module',
+    'condition',
     'django_celery_beat',
 ]
 
@@ -98,11 +102,12 @@ WSGI_APPLICATION = 'mhq_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mhqDB',
-        'USER': 'mhq',
-        'PASSWORD': config('DB_PASS', default='root'),
-        'HOST': 'localhost',
+        'ENGINE': os.environ.get('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.environ.get('DB_NAME', default='mhqDB'),
+        'USER': os.environ.get('DB_USER', default='mhq'),
+        'PASSWORD': os.environ.get('DB_PASS', default='root'),
+        'HOST': os.environ.get('DB_HOST', default='localhost'),
+        'PORT': os.environ.get('DB_PORT', default='5432'),
     }
 }
 
@@ -155,7 +160,7 @@ DJOSER = {
     }
 }
 
-secret_key_gmail = config('SECRET_KEY', default='nothing')
+secret_key_gmail = config('SECRET_KEY_GMAIL', default='nothing')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

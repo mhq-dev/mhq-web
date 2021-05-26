@@ -19,6 +19,12 @@ class Request(models.Model):
     def get_params(self):
         return KeyValueContainer.objects.all().filter(request__id=self.id, type=KeyValueContainer.PARAM)
 
+    def get_enabled_headers(self):
+        return self.get_headers().filter(enable=True)
+
+    def get_enabled_params(self):
+        return self.get_params().filter(enable=True)
+
     def get_form_data(self):
         pass
 

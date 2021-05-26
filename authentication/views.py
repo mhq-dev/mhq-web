@@ -29,7 +29,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def search(self, request, *args, **kwargs):
-        search_key = kwargs.get('useranme_search').lower()
+        search_key = kwargs.get('username').lower()
         if len(search_key) == 0:
             return Response({'msg': 'send something ...'}, status=status.HTTP_400_BAD_REQUEST)
         users = User.objects.all().filter(username__icontains=search_key)
