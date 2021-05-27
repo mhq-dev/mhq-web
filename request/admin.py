@@ -4,3 +4,4 @@ from request import models
 
 admin.site.register(models.Request)
 admin.site.register(models.KeyValueContainer)
+admin.site.register(models.RequestHistory)
