@@ -23,10 +23,12 @@ class User(AbstractUser):
         db_table = 'users'
 
     def get_user_followers(self):
-        return UserFollow.objects.all().filter(followed=self)
+        l = UserFollow.objects.all().filter(followed=self)
+        return [u.follower for u in l]
 
     def get_user_followings(self):
-        return UserFollow.objects.all().filter(follower=self)
+        l = UserFollow.objects.all().filter(follower=self)
+        return [u.followed for u in l]
 
     def __str__(self):
         return self.username

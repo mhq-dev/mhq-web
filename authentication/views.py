@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
-from django.forms.models import model_to_dict
 from authentication.models import User, UserFollow
 from authentication.serializer import UserProfileSerializer, UserFollowCreateSerializer, UserLiteSerializer
 
@@ -37,13 +36,13 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return JsonResponse(UserProfileSerializer(users, many=True).data, safe=False, status=status.HTTP_200_OK)
 
     def get_followers(self, request, *args, **kwargs):
-        uname = request.get('username').lower()
+        uname = kwargs.get('username').lower()
         user = get_object_or_404(User, username=uname)
         return JsonResponse(UserLiteSerializer(user.get_user_followers(), many=True).data, safe=False,
                             status=status.HTTP_200_OK)
 
     def get_followings(self, request, *args, **kwargs):
-        uname = request.get('username').lower()
+        uname = kwargs.get('username').lower()
         user = get_object_or_404(User, username=uname)
         return JsonResponse(UserLiteSerializer(user.get_user_followings(), many=True).data, safe=False,
                             status=status.HTTP_200_OK)
@@ -59,13 +58,12 @@ class UserFollowViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         dist_username = kwargs.get('username')
         dist_user = get_object_or_404(User, username=dist_username)
-        user_follow = UserFollow(follower_id=request.user.id, followed_id=dist_user.id)
-        print(model_to_dict(instance=user_follow))
-        serializer = UserFollowCreateSerializer(data=model_to_dict(user_follow))
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
-        return Response({'msg': f'{serializer.errors}'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserFollowCreateSerializer(
+            data={'follower': request.user.id, 'followed': dist_user.id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        ## TODO {return the username of validated data}
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         username = kwargs.get('username')
