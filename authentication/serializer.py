@@ -1,7 +1,7 @@
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from .models import User
+from .models import User, UserFollow
 
 
 class UserSerializer(UserCreateSerializer):
@@ -15,3 +15,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'avatar', 'bio']
         read_only_fields = ['username', 'email']
+
+
+class UserFollowCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFollow
+        fields = ['follower', 'followed', ]
+
+
+class UserLiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'avatar', 'bio', ]
+
