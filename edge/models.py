@@ -14,3 +14,11 @@ class Edge(models.Model):
 
     def get_dist(self):
         return self.dist
+
+
+class Statement(models.Model):
+    name = models.CharField(max_length=150, blank=True)
+    edge = models.OneToOneField(Edge, on_delete=models.CASCADE, related_name='statement_of')
+
+    class Meta:
+        db_table = 'conditions'
