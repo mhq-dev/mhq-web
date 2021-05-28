@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/scenario/', include('scenario.urls')),
     path('api/module/', include('module.urls')),
     path('api/edge/', include('edge.urls')),
+    path('api/condition/', include('condition.urls')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
