@@ -21,4 +21,4 @@ class Statement(models.Model):
     edge = models.OneToOneField(Edge, on_delete=models.CASCADE, related_name='statement_of')
 
     class Meta:
-        db_table = 'conditions'
+        db_table = 'statements'
