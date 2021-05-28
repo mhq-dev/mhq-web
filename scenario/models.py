@@ -27,7 +27,7 @@ class Scenario(models.Model):
 
 
 def get_default_periodic_task(scenario):
-    interval = IntervalSchedule.objects.create(
+    interval = IntervalSchedule.objects.get_or_create(
         every=15,
         period=IntervalSchedule.MINUTES)
     return PeriodicTask.objects.create(
@@ -35,7 +35,8 @@ def get_default_periodic_task(scenario):
         interval=interval,
         name='scenario_' + scenario.name + '_schedule',
         task='scenario.tasks.execute',
-        args=json.dumps([scenario.id]))
+        args=json.dumps([scenario.id])
+    )
 
 
 class Schedule(models.Model):

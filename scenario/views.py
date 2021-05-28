@@ -75,7 +75,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         if serializer.validated_data['type'] == Schedule.INTERVALS:
             if 'minutes' not in serializer.validated_data:
                 return Response({'msg': 'intervals needs minutes'}, status=status.HTTP_400_BAD_REQUEST)
-            periodic_task.interval = IntervalSchedule.objects.create(
+            periodic_task.interval = IntervalSchedule.objects.get_or_create(
                 every=serializer.validated_data['minutes'],
                 period=IntervalSchedule.MINUTES
             )
@@ -85,7 +85,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         elif serializer.validated_data['type'] == Schedule.ONCE:
             if 'date' not in serializer.validated_data:
                 return Response({'msg': 'once needs date'}, status=status.HTTP_400_BAD_REQUEST)
-            periodic_task.clocked = ClockedSchedule.objects.create(
+            periodic_task.clocked = ClockedSchedule.objects.get_or_create(
                 clocked_time=serializer.validated_data['date']
             )
             periodic_task.one_off = True
@@ -94,7 +94,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         elif serializer.validated_data['type'] == Schedule.EVERY_DAY:
             if 'time' not in serializer.validated_data:
                 return Response({'msg': 'every_day needs time'}, status=status.HTTP_400_BAD_REQUEST)
-            periodic_task.crontab = CrontabSchedule.objects.create(
+            periodic_task.crontab = CrontabSchedule.objects.get_or_create(
                 minute=serializer.validated_data['time'].minute,
                 hour=serializer.validated_data['time'].hour
             )
@@ -104,7 +104,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         elif serializer.validated_data['type'] == Schedule.DAYS_OF_WEEK:
             if 'time' not in serializer.validated_data or 'days' not in serializer.validated_data:
                 return Response({'msg': 'days_of_week needs time and days'}, status=status.HTTP_400_BAD_REQUEST)
-            periodic_task.crontab = CrontabSchedule.objects.create(
+            periodic_task.crontab = CrontabSchedule.objects.get_or_create(
                 minute=serializer.validated_data['time'].minute,
                 hour=serializer.validated_data['time'].hour,
                 day_of_week=serializer.validated_data['days']
@@ -115,7 +115,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
         elif serializer.validated_data['type'] == Schedule.DAYS_OF_MONTH:
             if 'time' not in serializer.validated_data or 'days' not in serializer.validated_data:
                 return Response({'msg': 'days_of_month needs time and days'}, status=status.HTTP_400_BAD_REQUEST)
-            periodic_task.crontab = CrontabSchedule.objects.create(
+            periodic_task.crontab = CrontabSchedule.objects.get_or_create(
                 minute=serializer.validated_data['time'].minute,
                 hour=serializer.validated_data['time'].hour,
                 day_of_month=serializer.validated_data['days']
@@ -129,7 +129,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
                     'months' not in serializer.validated_data:
                 return Response({'msg': 'specified_dates needs time, days and months'},
                                 status=status.HTTP_400_BAD_REQUEST)
-            periodic_task.crontab = CrontabSchedule.objects.create(
+            periodic_task.crontab = CrontabSchedule.objects.get_or_create(
                 minute=serializer.validated_data['time'].minute,
                 hour=serializer.validated_data['time'].hour,
                 day_of_month=serializer.validated_data['days'],
