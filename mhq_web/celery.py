@@ -29,4 +29,4 @@ def debug_task(self):
 def print_date():
     dt_string = crontab().now().strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
-    print('weekday: ', crontab().now().weekday() + ' ' + calendar.day_name[crontab().now().weekday()])
+    print('weekday: ', crontab().now().weekday(), ' ', calendar.day_name[crontab().now().weekday()])

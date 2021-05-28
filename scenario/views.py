@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+from rest_framework.response import Response
+
 from .serializers import ScenarioSerializer
 from rest_framework import viewsets, status
 from .models import Scenario
@@ -37,3 +39,30 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         return JsonResponse({'node_count': node_num,
                              'edges': SpecificEdgeSerializer(edges, many=True).data}, safe=False,
                             status=status.HTTP_200_OK)
+
+
+class StarterModuleViewSet(viewsets.ViewSet):
+
+    def set_starter_module(self, request, pk, module_id):
+        scenario = get_object_or_404(Scenario, id=pk)
+        module = get_object_or_404(scenario.get_modules(), id=module_id)
+        scenario.starter_module = module
+        return Response({'msg': 'set successfully'}, status=status.HTTP_200_OK)
+
+    def set_schedule(self, request, pk, schedule_type):
+        scenario = get_object_or_404(Scenario, id=pk)
+        schedule = scenario.schedule
+        if schedule_type == Scenario.INTERVALS:
+            pass
+        elif schedule_type == Scenario.ONCE:
+            pass
+        elif schedule_type == Scenario.EVERY_DAY:
+            pass
+        elif schedule_type == Scenario.DAYS_OF_WEEK:
+            pass
+        elif schedule_type == Scenario.DAYS_OF_MONTH:
+            pass
+        elif schedule_type == Scenario.SPECIFIED_DATES:
+            pass
+        else:
+            return Response({'msg': 'schedule type is invalid!'}, status=status.HTTP_400_BAD_REQUEST)

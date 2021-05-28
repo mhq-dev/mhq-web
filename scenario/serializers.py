@@ -16,14 +16,6 @@ class CollectionScenarioSerializer(serializers.ModelSerializer):
         read_only_fields = ['name', 'type']
 
 
-class ScenarioSerializer(serializers.ModelSerializer):
-    collection = CollectionScenarioSerializer(required=False)
-
-    class Meta:
-        model = Scenario
-        fields = ['id', 'name', 'collection']
-
-
 class SpecificModuleSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='request.name', read_only=True)
 
@@ -39,3 +31,12 @@ class SpecificEdgeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Edge
         fields = ['source', 'dist']
+
+
+class ScenarioSerializer(serializers.ModelSerializer):
+    collection = CollectionScenarioSerializer(required=False)
+    starter_module = SpecificModuleSerializer(read_only=True)
+
+    class Meta:
+        model = Scenario
+        fields = ['id', 'name', 'collection', 'starter_module']
