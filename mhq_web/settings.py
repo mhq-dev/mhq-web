@@ -170,8 +170,6 @@ EMAIL_HOST_USER = 'talkzone2021@gmail.com'
 EMAIL_HOST_PASSWORD = secret_key_gmail
 EMAIL_USE_TLS = True
 
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
