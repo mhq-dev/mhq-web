@@ -1,4 +1,5 @@
 from django.db import models
+from condition.models import Condition
 
 
 class Edge(models.Model):
@@ -22,3 +23,6 @@ class Statement(models.Model):
 
     class Meta:
         db_table = 'statements'
+
+    def get_condition(self):
+        return Condition.objects.all().filter(statement=self)

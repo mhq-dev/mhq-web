@@ -12,3 +12,7 @@ detail_cond = ConditionViewSet.as_view({
 create_cond = ConditionViewSet.as_view({
     'post': 'create'
 })
+
+cond_of_statement = ConditionViewSet.as_view({
+    'get': 'get_condition_of_statement',
+})

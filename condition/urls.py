@@ -5,5 +5,6 @@ urlpatterns = [
     path('available_condition/', viewsets.available_cond),
     path('<int:pk>', viewsets.detail_cond),
     path('', viewsets.create_cond),
+    path('statement/<int:statement_id>', viewsets.cond_of_statement),
 
 ]
