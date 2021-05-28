@@ -36,7 +36,7 @@ class SpecificModuleSerializer(serializers.ModelSerializer):
 class ConditionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Condition
-        fields = ['id', 'first', 'second', 'statement', 'operator']
+        fields = '__all__'
 
 
 class SpecificEdgeSerializer(serializers.ModelSerializer):
@@ -47,3 +47,9 @@ class SpecificEdgeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Edge
         fields = ['source', 'dist', 'condition']
+
+
+class ModuleScenarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Module
+        fields = ['id', 'request', 'x_position', 'y_position']
