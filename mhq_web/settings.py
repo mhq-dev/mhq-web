@@ -28,6 +28,19 @@ DEBUG = int(os.environ.get('DEBUG', default=1))
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default='*').split(" ")
 CORS_ALLOW_ALL_ORIGINS = True
 
+# CELERY STUFF
+BROKER_URL = 'redis://redis:6379'
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tehran'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,6 +64,7 @@ INSTALLED_APPS = [
     'edge',
     'module',
     'condition',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -156,6 +170,8 @@ EMAIL_HOST_USER = 'talkzone2021@gmail.com'
 EMAIL_HOST_PASSWORD = secret_key_gmail
 EMAIL_USE_TLS = True
 
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -181,4 +197,3 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
