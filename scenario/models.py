@@ -14,7 +14,7 @@ class Scenario(models.Model):
                                           on_delete=models.DO_NOTHING,
                                           null=True,
                                           related_name='starter_module')
-    schedule = models.OneToOneField('Schedule', on_delete=models.CASCADE, null=True)
+    schedule = models.OneToOneField('ScenarioSchedule', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return str(self.id) + ') ' + self.name
@@ -27,7 +27,7 @@ class Scenario(models.Model):
 
 
 def get_default_periodic_task(scenario):
-    interval = IntervalSchedule.objects.get_or_create(
+    interval, temp = IntervalSchedule.objects.get_or_create(
         every=15,
         period=IntervalSchedule.MINUTES)
     return PeriodicTask.objects.create(
@@ -39,7 +39,7 @@ def get_default_periodic_task(scenario):
     )
 
 
-class Schedule(models.Model):
+class ScenarioSchedule(models.Model):
     INTERVALS = 'intervals'
     ONCE = 'once'
     EVERY_DAY = 'every_day'
@@ -59,4 +59,4 @@ class Schedule(models.Model):
     expired_date_time = models.DateTimeField(null=True)
 
     class Meta:
-        db_table = 'schedule'
+        db_table = 'scenario_schedules'

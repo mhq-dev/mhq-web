@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Scenario, Schedule
+from .models import Scenario, ScenarioSchedule
 from collection.models import Collection
 from module.models import Module
 from edge.models import Edge
@@ -44,16 +44,16 @@ class ScenarioSerializer(serializers.ModelSerializer):
 
 class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Schedule
+        model = ScenarioSchedule
         fields = ['type', 'enable', 'minutes', 'date',
                   'time', 'days', 'months',
                   'start_date_time', 'expired_date_time']
         extra_kwargs = {'type': {'required': True}}
 
     def validate_type(self, s_type):
-        if s_type not in [Schedule.INTERVALS, Schedule.ONCE, Schedule.EVERY_DAY,
-                          Schedule.DAYS_OF_WEEK, Schedule.DAYS_OF_MONTH,
-                          Schedule.SPECIFIED_DATES]:
+        if s_type not in [ScenarioSchedule.INTERVALS, ScenarioSchedule.ONCE, ScenarioSchedule.EVERY_DAY,
+                          ScenarioSchedule.DAYS_OF_WEEK, ScenarioSchedule.DAYS_OF_MONTH,
+                          ScenarioSchedule.SPECIFIED_DATES]:
             raise serializers.ValidationError("your schedule type is not valid!")
         return s_type
 
@@ -69,9 +69,9 @@ class ScheduleSerializer(serializers.ModelSerializer):
                 d = int(d)
             except ValueError:
                 raise serializers.ValidationError("days is not valid!")
-            if self.initial_data['type'] == Schedule.DAYS_OF_MONTH and (d > 31 or d < 1):
+            if self.initial_data['type'] == ScenarioSchedule.DAYS_OF_MONTH and (d > 31 or d < 1):
                 raise serializers.ValidationError("days is not valid!")
-            if self.initial_data['type'] == Schedule.DAYS_OF_WEEK and (d > 6 or d < 0):
+            if self.initial_data['type'] == ScenarioSchedule.DAYS_OF_WEEK and (d > 6 or d < 0):
                 raise serializers.ValidationError("days is not valid!")
         return days
 

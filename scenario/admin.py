@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Scenario, Schedule
+from .models import Scenario, ScenarioSchedule
 
 admin.site.register(Scenario)
-admin.site.register(Schedule)
+admin.site.register(ScenarioSchedule)
