@@ -5,4 +5,4 @@ from scenario.models import Scenario
 @app.task
 def execute(scenario_id):
     scenario = Scenario.objects.get(id=scenario_id)
-    pass
+    print('Hi')
