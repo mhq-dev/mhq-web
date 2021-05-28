@@ -113,12 +113,14 @@ class RequestHistoryViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        page = int(self.request.query_params.get('page'))
+        page = self.request.query_params.get('page')
         if page is None:
             page = 1
-        limit = int(self.request.query_params.get('limit'))
+        page = int(page)
+        limit = self.request.query_params.get('limit')
         if limit is None:
             limit = 10
+        limit = int(limit)
 
         paginator = Paginator(queryset, limit)
         if paginator.num_pages < page:
