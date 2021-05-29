@@ -1,3 +1,4 @@
+import calendar
 import os
 
 from celery import Celery
@@ -21,4 +22,11 @@ app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
-    print('Request: {0!r}'.format(self.request))
+    print(f'Request: {self.request!r}')
+
+
+@app.task
+def print_date():
+    dt_string = crontab().now().strftime("%d/%m/%Y %H:%M:%S")
+    print("date and time =", dt_string)
+    print('weekday: ', crontab().now().weekday() + ' ' + calendar.day_name[crontab().now().weekday()])

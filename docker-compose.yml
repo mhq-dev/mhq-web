@@ -22,6 +22,19 @@ services:
     command: celery -A mhq_web worker -l info
     volumes:
       - .:/home/app/web/
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A mhq_web beat -l info
+    volumes:
+      - .:/home/app/web/
+    env_file:
+      - ./.env.dev
     depends_on:
       - db
       - redis

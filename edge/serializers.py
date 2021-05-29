@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
-from .models import Edge
+from .models import Edge, Statement
 
 
 class EdgeCreateSerializer(ModelSerializer):
@@ -11,3 +11,9 @@ class EdgeCreateSerializer(ModelSerializer):
         if attrs['source'] == attrs['dist']:
             raise ValidationError('Not Allowed to have cycle .')
         return super(EdgeCreateSerializer, self).validate(attrs)
+
+
+class StatementSerializer(ModelSerializer):
+    class Meta:
+        model = Statement
+        fields = '__all__'
