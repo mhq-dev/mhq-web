@@ -1,4 +1,4 @@
-from .views import ScenarioViewSets
+from .views import ScenarioViewSets, ScheduleViewSet
 
 scenarios_list = ScenarioViewSets.as_view({
     'get': 'list',
@@ -19,4 +19,13 @@ specific_scenario_edges = ScenarioViewSets.as_view({
 
 all_modules_scenario = ScenarioViewSets.as_view({
     'get': 'get_module_of_scenario'
+})
+
+scenario_starter_module = ScenarioViewSets.as_view({
+    'put': 'set_starter_module',
+})
+
+scenario_schedule = ScheduleViewSet.as_view({
+    'get': 'get_schedule',
+    'put': 'set_schedule',
 })

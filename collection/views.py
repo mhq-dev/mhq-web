@@ -52,6 +52,9 @@ class UserCollectionViewSet(viewsets.GenericViewSet):
     serializer_class = UserCollectionSerializer
     update_serializer_class = UserCollectionUpdateSerializer
 
+    def get_queryset(self):
+        pass
+
     def add_user(self, request, pk, username):
         role = request.data['role']
         user = get_object_or_404(User, username=username)
