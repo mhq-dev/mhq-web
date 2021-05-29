@@ -1,4 +1,5 @@
 from django.db import models
+from edge.models import Edge
 
 
 class Module(models.Model):
@@ -9,3 +10,10 @@ class Module(models.Model):
 
     class Meta:
         db_table = 'module'
+
+    def get_neighbours(self):
+        near = Edge.objects.all().filter(source=self)
+        return [n.dist for n in near]
+
+    def run_module(self):
+        print('Hello')
