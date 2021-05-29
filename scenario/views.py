@@ -11,7 +11,7 @@ from rest_framework.generics import get_object_or_404
 from .permissions import ScenarioPermission
 from edge.models import Edge
 from module.models import Module
-from .serializers import SpecificEdgeSerializer
+from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
@@ -45,6 +45,12 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         return JsonResponse({'node_count': node_num,
                              'edges': SpecificEdgeSerializer(edges, many=True).data}, safe=False,
                             status=status.HTTP_200_OK)
+
+    def get_module_of_scenario(self, request, *args, **kwargs):
+        return JsonResponse(
+            ModuleScenarioSerializer(Module.objects.all().filter(scenario_id=kwargs.get('scenario_id')),
+                                     many=True).data,
+            safe=False, status=status.HTTP_200_OK)
 
     def set_starter_module(self, request, pk, module_id):
         scenario = get_object_or_404(Scenario, id=pk)

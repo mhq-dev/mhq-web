@@ -17,6 +17,10 @@ specific_scenario_edges = ScenarioViewSets.as_view({
     'get': 'retrieve',
 })
 
+all_modules_scenario = ScenarioViewSets.as_view({
+    'get': 'get_module_of_scenario'
+})
+
 scenario_starter_module = ScenarioViewSets.as_view({
     'put': 'set_starter_module',
 })
