@@ -4,9 +4,9 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/front
 WORKDIR $APP_HOME
 
-COPY ../mhq-front/package.json .
+COPY ./mhq-front/package.json .
 RUN npm install --legacy-peer-deps
-COPY ../mhq-front .
+COPY ./mhq-front .
 
 RUN npm run build
 
