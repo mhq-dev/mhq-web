@@ -353,4 +353,7 @@ infos.txt
 ar-mhq-web-privatekey-putty.txt
 ar-mhq-web-privatekey.txt
 
+mhq-front
+mhq-front/*
+
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm,venv,python
