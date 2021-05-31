@@ -20,6 +20,7 @@ media
 # <django-project-name>/staticfiles/
 
 static/
+django_static/
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
