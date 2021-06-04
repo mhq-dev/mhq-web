@@ -21,8 +21,6 @@ services:
   celery:
     build: .
     command: celery -A mhq_web worker -l info
-    volumes:
-      - .:/home/app/web/
     env_file:
       - ./.env.prod
     depends_on:
@@ -32,8 +30,6 @@ services:
   celery-beat:
     build: .
     command: celery -A mhq_web beat -l info
-    volumes:
-      - .:/home/app/web/
     env_file:
       - ./.env.prod
     depends_on:
