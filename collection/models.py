@@ -18,7 +18,7 @@ class Collection(models.Model):
         return Request.objects.all().filter(collection__id=self.id)
 
     def get_scenarios(self):
-        Scenario.objects.all().filter(collection_id=self.id)
+        return Scenario.objects.all().filter(collection_id=self.id)
 
     def __str__(self):
         return str(self.id) + ') ' + self.name
