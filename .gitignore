@@ -20,6 +20,7 @@ media
 # <django-project-name>/staticfiles/
 
 static/
+django_static/
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
@@ -352,5 +353,8 @@ infos.txt
 
 ar-mhq-web-privatekey-putty.txt
 ar-mhq-web-privatekey.txt
+
+nginx/mhq-front
+nginx/mhq-front/*
 
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm,venv,python
