@@ -13,11 +13,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Pull front project
+      run: |
+        cd nginx
+        git clone https://github.com/mhq-dev/mhq-front.git
+        cd mhq-front
+        git checkout develop
+        cd ../..
+    
     - name: Build the docker-compose
-      run: docker-compose up -d --build
+      run: docker-compose -f docker-compose.prod.yml up -d --build
     
     - name: Check running containers
       run: docker ps
     
     - name: Run tests
-      run: docker-compose exec -T web python manage.py test
+      run: docker-compose -f docker-compose.prod.yml exec -T web python manage.py test
