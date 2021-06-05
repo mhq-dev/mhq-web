@@ -20,4 +20,4 @@ jobs:
       run: docker ps
     
     - name: Run tests
-      run: docker-compose exec web python manage.py test
+      run: docker-compose exec -T web python manage.py test
