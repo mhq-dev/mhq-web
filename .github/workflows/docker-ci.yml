@@ -23,8 +23,11 @@ jobs:
         
     - name: Make env files
       run: |
-        echo ${{ secrets.ENV_PROD }} > ./.env.prod
-        echo ${{ secrets.ENV_PROD_DB }} > ./.env.prod.db
+        echo "$ENV_PROD" > .env.prod
+        echo "$ENV_PROD_DB" > .env.prod.db
+      env:
+        ENV_PROD: ${{secrets.ENV_PROD}}
+        ENV_PROD_DB: ${{secrets.ENV_PROD_DB}}
     
     - name: Build the docker-compose
       run: docker-compose -f docker-compose.prod.yml up -d --build
