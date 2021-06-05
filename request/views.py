@@ -43,7 +43,7 @@ class RequestViewSet(viewsets.ModelViewSet):
         return JsonResponse(RequestFullSerializer(mhq_requests, many=True).data, safe=False)
 
     def execute(self, request, pk):
-        mhq_request = get_object_or_404(self.get_queryset(), pk)
+        mhq_request = get_object_or_404(self.get_queryset(), id=pk)
 
         try:
             response = RequestExecution(request=mhq_request).execute()

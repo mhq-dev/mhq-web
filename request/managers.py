@@ -19,6 +19,7 @@ class RequestExecution:
         self.request = request
 
     def get(self):
+
         return requests.get(self.request.url,
                             headers=get_key_value_dict(self.request.get_enabled_headers()),
                             params=get_key_value_dict(self.request.get_enabled_params())
@@ -46,8 +47,8 @@ class RequestExecution:
 
         try:
             result = method_types[self.request.http_method]()
-        except:
-            raise BadRequestException(message="Could not send request")
+        except Exception as e:
+            raise BadRequestException(message=str(e))
 
         try:
             result_body = result.json()
