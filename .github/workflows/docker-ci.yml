@@ -20,6 +20,11 @@ jobs:
         cd mhq-front
         git checkout develop
         cd ../..
+        
+    - name: Make env files
+      run: |
+        echo ${{ secrets.ENV_PROD }} > ./.env.prod
+        echo ${{ secrets.ENV_PROD_DB }} > ./.env.prod.db
     
     - name: Build the docker-compose
       run: docker-compose -f docker-compose.prod.yml up -d --build
