@@ -1,4 +1,4 @@
-from .views import ScenarioViewSets, ScheduleViewSet
+from .views import ScenarioViewSets, ScheduleViewSet, ScenarioHistoryViewSet
 
 scenarios_list = ScenarioViewSets.as_view({
     'get': 'list',
@@ -28,4 +28,12 @@ scenario_starter_module = ScenarioViewSets.as_view({
 scenario_schedule = ScheduleViewSet.as_view({
     'get': 'get_schedule',
     'put': 'set_schedule',
+})
+
+scenario_history_get_list = ScenarioHistoryViewSet.as_view({
+    'get': 'list',
+})
+
+scenario_history_delete = ScenarioHistoryViewSet.as_view({
+    'delete': 'destroy'
 })

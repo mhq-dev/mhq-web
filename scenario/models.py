@@ -25,6 +25,9 @@ class Scenario(models.Model):
     class Meta:
         db_table = 'scenarios'
 
+    def get_scenario_history(self):
+        return ScenarioHistory.objects.all().filter(scenario=self)
+
 
 def get_default_periodic_task(scenario):
     interval, temp = IntervalSchedule.objects.get_or_create(
@@ -60,3 +63,16 @@ class ScenarioSchedule(models.Model):
 
     class Meta:
         db_table = 'scenario_schedules'
+
+
+class ScenarioHistory(models.Model):
+    name = models.CharField(max_length=250)
+    collection = models.ForeignKey('collection.Collection', null=True, on_delete=models.SET_NULL)
+    execution_time = models.DateTimeField(auto_now_add=True)
+    schedule = models.OneToOneField(ScenarioSchedule, on_delete=models.CASCADE, null=True)
+    order = models.CharField(max_length=200)
+    scenario = models.ForeignKey(Scenario, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey('authentication.User', null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        db_table = 'scenario_history'

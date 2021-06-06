@@ -4,6 +4,9 @@ from collection.models import Collection
 from module.models import Module
 from edge.models import Edge
 from condition.models import Condition
+from .models import ScenarioHistory
+from request.models import RequestHistory
+from django.shortcuts import get_object_or_404
 
 
 class CollectionScenarioSerializer(serializers.ModelSerializer):
@@ -99,3 +102,25 @@ class ModuleScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = ['id', 'request', 'x_position', 'y_position']
+
+
+class ScenarioHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScenarioHistory
+        fields = '__all__'
+
+    def validate(self, attrs):
+        print("Hello")
+        if len(attrs['order']) == 0 and ('schedule' not in attrs):
+            raise serializers.ValidationError('you should pass order or schedule')
+        if len(attrs['order']) != 0:
+            for o in attrs['order']:
+                get_object_or_404(RequestHistory, id=o)
+
+
+class ScenarioRelHistorySerializer(serializers.ModelSerializer):
+    scenario_histories = ScenarioHistorySerializer(source='get_scenario_history', many=True, read_only=True)
+
+    class Meta:
+        model = Scenario
+        fields = ['scenario_histories',]
