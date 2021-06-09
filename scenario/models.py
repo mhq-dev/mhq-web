@@ -8,8 +8,8 @@ from module.models import Module
 
 
 class Scenario(models.Model):
-    name = models.CharField(max_length=100)
-    collection = models.ForeignKey('collection.Collection', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, blank=True)
+    collection = models.ForeignKey('collection.Collection', on_delete=models.CASCADE, blank=True)
     starter_module = models.OneToOneField('module.Module',
                                           on_delete=models.DO_NOTHING,
                                           null=True,
@@ -22,6 +22,9 @@ class Scenario(models.Model):
 
     def get_modules(self):
         return Module.objects.all().filter(scenario__id=self.id)
+
+    def get_edges(self):
+        return Edge.objects.all().filter(source__scenario__id=self.id)
 
     class Meta:
         db_table = 'scenarios'

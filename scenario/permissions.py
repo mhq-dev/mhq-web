@@ -4,20 +4,26 @@ from collection.models import UserCollection, Collection
 
 class ScenarioPermission(BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'POST':
-            user_collection = UserCollection.objects.all().filter(user=request.user,
-                                                                  collection_id=request.data['collection'])
-            if len(user_collection) < 1 or user_collection.first().role == UserCollection.VISITOR:
+        if view.action == 'update' or view.action == 'destroy' or view.action == 'create':
+            if not request.user.is_authenticated:
                 return False
+
+        if view.action == 'create':
+            # TODO find better idea for this
+            if 'collection' not in request.data:
+                return False
+
+            user_collection = UserCollection.objects.filter(user=request.user,
+                                                            collection__id=request.data['collection'])
+            if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
+                return False
+
         return True
 
     def has_object_permission(self, request, view, obj):
-        user_collection = UserCollection.objects.filter(user=request.user, collection=obj.collection)
-        if request.method == 'GET':
-            if obj.collection.type == Collection.PRIVATE and len(user_collection) != 1:
-                return False
-        else:
-            if len(user_collection) != 1 or user_collection[0].role == UserCollection.VISITOR:
+        if view.action == 'update' or view.action == 'destroy':
+            user_collection = UserCollection.objects.filter(user=request.user, collection=obj.collection)
+            if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
                 return False
 
         return True

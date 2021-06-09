@@ -10,12 +10,6 @@ class Edge(models.Model):
         unique_together = ('source', 'dist')
         db_table = 'edges'
 
-    def get_source(self):
-        return self.source
-
-    def get_dist(self):
-        return self.dist
-
 
 class Statement(models.Model):
     name = models.CharField(max_length=150, blank=True)
