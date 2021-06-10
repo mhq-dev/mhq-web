@@ -69,11 +69,15 @@ class ScheduleSerializer(serializers.ModelSerializer):
         return s_type
 
     def validate_minutes(self, minutes):
+        if minutes is None:
+            return minutes
         if minutes < 15:
             raise serializers.ValidationError("Minute must be higher than or equal to 15!")
         return minutes
 
     def validate_days(self, days):
+        if days is None:
+            return days
         days_list = days.split(',')
         for d in days_list:
             try:
@@ -87,6 +91,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
         return days
 
     def validate_months(self, months):
+        if months is None:
+            return months
         months_list = months.split(',')
         for m in months_list:
             try:

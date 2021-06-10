@@ -13,8 +13,9 @@ class Scenario(models.Model):
     starter_module = models.OneToOneField('module.Module',
                                           on_delete=models.DO_NOTHING,
                                           null=True,
+                                          blank=True,
                                           related_name='starter_module')
-    schedule = models.OneToOneField('ScenarioSchedule', on_delete=models.CASCADE, null=True)
+    schedule = models.OneToOneField('ScenarioSchedule', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return str(self.id) + ') ' + self.name
@@ -53,13 +54,13 @@ class ScenarioSchedule(models.Model):
     type = models.CharField(max_length=255, default=INTERVALS)
     enable = models.BooleanField(default=False)
     periodic_task = models.OneToOneField(PeriodicTask, on_delete=models.DO_NOTHING)
-    minutes = models.IntegerField(null=True, default=15)
-    date = models.DateTimeField(null=True)
-    time = models.TimeField(null=True)
-    days = models.CharField(max_length=255, null=True)
-    months = models.CharField(max_length=255, null=True)
-    start_date_time = models.DateTimeField(null=True)
-    expired_date_time = models.DateTimeField(null=True)
+    minutes = models.IntegerField(null=True, default=15, blank=True)
+    date = models.DateTimeField(null=True, blank=True)
+    time = models.TimeField(null=True, blank=True)
+    days = models.CharField(max_length=255, null=True, blank=True)
+    months = models.CharField(max_length=255, null=True, blank=True)
+    start_date_time = models.DateTimeField(null=True, blank=True)
+    expired_date_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'scenario_schedules'
