@@ -1,0 +1,39 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Pull front project
+      run: |
+        cd nginx
+        git clone https://github.com/mhq-dev/mhq-front.git
+        cd mhq-front
+        git checkout develop
+        cd ../..
+        
+    - name: Make env files
+      run: |
+        echo "$ENV_PROD" > .env.prod
+        echo "$ENV_PROD_DB" > .env.prod.db
+      env:
+        ENV_PROD: ${{secrets.ENV_PROD}}
+        ENV_PROD_DB: ${{secrets.ENV_PROD_DB}}
+    
+    - name: Build the docker-compose
+      run: docker-compose -f docker-compose.prod.yml up -d --build
+    
+    - name: Check running containers
+      run: docker ps
+    
+    - name: Run tests
+      run: docker-compose -f docker-compose.prod.yml exec -T web python manage.py test
