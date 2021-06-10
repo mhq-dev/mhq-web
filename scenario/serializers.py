@@ -123,4 +123,4 @@ class ScenarioRelHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Scenario
-        fields = ['scenario_histories',]
+        fields = ['scenario_histories', ]

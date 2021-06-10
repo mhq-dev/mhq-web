@@ -16,6 +16,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
     ScenarioHistorySerializer
 
+from .signals import scenario_run_finished
+
 
 class ScenarioViewSets(viewsets.ModelViewSet):
     serializer_class = ScenarioSerializer
@@ -68,6 +70,10 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ScenarioHistory.objects.all()
+
+    def nothing(self, request, *args, **kwargs):
+        scenario_run_finished.send(sender=None)
+        return Response(status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')
