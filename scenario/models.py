@@ -37,7 +37,7 @@ def get_default_periodic_task(scenario):
     return PeriodicTask.objects.create(
         enabled=False,
         interval=interval,
-        name='scenario_' + scenario.name + '_schedule',
+        name='scenario_' + str(scenario.id) + '_' + scenario.name + '_schedule',
         task='scenario.tasks.execute',
         args=json.dumps([scenario.id])
     )

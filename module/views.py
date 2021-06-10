@@ -1,24 +1,22 @@
-from .serializers import ModuleCreateSerializer, ModuleCompleteSerializer
+from django.db.models import Q
+
+from collection.models import Collection
+from .serializers import ModuleSerializer
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Module
-from django.shortcuts import get_object_or_404
-from django.http.response import JsonResponse
-from rest_framework import status
 from .permissions import ModulePermission
 
 
 class ModuleViewSet(viewsets.ModelViewSet):
-    serializer_class = ModuleCreateSerializer
+    serializer_class = ModuleSerializer
     permission_classes = [IsAuthenticated, ModulePermission, ]
 
     def get_queryset(self):
-        return Module.objects.all()
-
-    def retrieve(self, request, *args, **kwargs):
-        module_id = kwargs.get('module_id')
-        module = get_object_or_404(Module, id=module_id)
-        return JsonResponse(ModuleCompleteSerializer(module, many=False).data, safe=False, status=status.HTTP_200_OK)
+        if self.request.user.is_authenticated:
+            return Module.objects.all().filter(Q(scenario__collection__type=Collection.PUBLIC)
+                                               | Q(scenario__collection__usercollection__user=self.request.user)).distinct()
+        return Module.objects.all().filter(scenario__collection__type=Collection.PUBLIC)
 
     def execute(self, request, *args, **kwargs):
         pass

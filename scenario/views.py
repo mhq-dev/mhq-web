@@ -9,7 +9,6 @@ from collection.models import Collection
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from .permissions import ScenarioPermission
-from module.models import Module
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
@@ -31,7 +30,6 @@ class ScenarioViewSets(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         scenario = serializer.save()
         scenario.schedule = ScenarioSchedule.objects.create(periodic_task=get_default_periodic_task(scenario))
-        scenario.starter_module = Module.objects.create(scenario=scenario, x_position=0.0, y_position=0.0)
         scenario.save()
 
     def list(self, request, *args, **kwargs):
