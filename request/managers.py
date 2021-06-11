@@ -1,4 +1,5 @@
 import requests
+from .models import RequestHistory
 
 
 class BadRequestException(Exception):
@@ -15,8 +16,9 @@ def get_key_value_dict(key_values):
 
 class RequestExecution:
 
-    def __init__(self, request):
+    def __init__(self, request, user):
         self.request = request
+        self.user = user
 
     def get(self):
 
@@ -55,9 +57,19 @@ class RequestExecution:
         except ValueError:
             result_body = result.text
 
-        return {
+        response = {
             "status": result.status_code,
             "headers": dict(result.headers),
             "cookies": dict(result.cookies),
             "body": result_body,
         }
+        req = RequestHistory.objects.create(user=self.user,
+                                            name=self.request.name,
+                                            http_method=self.request.http_method,
+                                            url=self.request.url,
+                                            body=self.request.body,
+                                            headers=get_key_value_dict(self.request.get_headers()),
+                                            params=get_key_value_dict(self.request.get_params()),
+                                            response=response)
+        req.save()
+        return response, req.id

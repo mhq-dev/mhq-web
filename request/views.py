@@ -46,7 +46,7 @@ class RequestViewSet(viewsets.ModelViewSet):
         mhq_request = get_object_or_404(self.get_queryset(), id=pk)
 
         try:
-            response = RequestExecution(request=mhq_request).execute()
+            response, request_history_id = RequestExecution(request=mhq_request, user=request.user).execute()
         except:
             return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
 

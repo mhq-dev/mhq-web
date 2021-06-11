@@ -13,7 +13,8 @@ from .permissions import ScenarioPermission, ScenarioHistoryPermission
 from edge.models import Edge
 from module.models import Module
 from .execute import Execution
-from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, ScenarioHistorySerializer
+from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
+    ScenarioHistorySerializer
 from .signals import scenario_run_finished
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -65,11 +66,11 @@ class ScenarioViewSets(viewsets.ModelViewSet):
     def execute(self, request, *args, **kwargs):
         scenario_id = kwargs.get('scenario_id')
         scenario = get_object_or_404(Scenario, id=scenario_id)
-        exe = Execution(scenario=scenario)
+        exe = Execution(scenario=scenario, user=request.user)
         response = exe.execute()
         if len(response) == 2 and isinstance(response[0], Exception):
-            return Response({'msg': response[0].message,
-                             'request': response[1]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg': str(response[0]),
+                             'request': str(response[1])}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'msg': exe.response_list, 'path': exe.path}, status=status.HTTP_200_OK)
 
 
@@ -79,10 +80,6 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ScenarioHistory.objects.all()
-
-    def nothing(self, request, *args, **kwargs):
-        scenario_run_finished.send(sender=None)
-        return Response(status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')
