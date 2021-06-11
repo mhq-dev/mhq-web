@@ -3,10 +3,10 @@ from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
-import requests
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from request.managers import RequestExecution
 from collection.models import Collection
 from request.models import Request, RequestHistory
 from request.permissions import RequestPermission
@@ -43,53 +43,12 @@ class RequestViewSet(viewsets.ModelViewSet):
         return JsonResponse(RequestFullSerializer(mhq_requests, many=True).data, safe=False)
 
     def execute(self, request, pk):
-        mhq_request = self.get_object()
-        result = ""
-        if mhq_request.http_method == Request.GET:
-            try:
-                result = requests.get(mhq_request.url,
-                                      headers=get_key_value_dict(mhq_request.get_enabled_headers()),
-                                      params=get_key_value_dict(mhq_request.get_enabled_params())
-                                      )
-            except:
-                return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if mhq_request.http_method == Request.POST:
-            try:
-                result = requests.post(mhq_request.url,
-                                       json=mhq_request.body,
-                                       headers=get_key_value_dict(mhq_request.get_enabled_headers())
-                                       )
-            except:
-                return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if mhq_request.http_method == Request.PUT:
-            try:
-                result = requests.put(mhq_request.url,
-                                      data=mhq_request.body,
-                                      headers=get_key_value_dict(mhq_request.get_enabled_headers())
-                                      )
-            except:
-                return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if mhq_request.http_method == Request.DELETE:
-            try:
-                result = requests.delete(mhq_request.url,
-                                         headers=get_key_value_dict(mhq_request.get_enabled_headers()))
-            except:
-                return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
+        mhq_request = get_object_or_404(self.get_queryset(), id=pk)
 
         try:
-            result_body = result.json()
-        except ValueError:
-            result_body = result.text
-
-        mhq_response = {
-            "status": result.status_code,
-            "headers": dict(result.headers),
-            "cookies": dict(result.cookies),
-            "body": result_body,
-        }
+            response = RequestExecution(request=mhq_request).execute()
+        except:
+            return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
 
         RequestHistory.objects.create(user=request.user,
                                       name=mhq_request.name,
@@ -98,9 +57,9 @@ class RequestViewSet(viewsets.ModelViewSet):
                                       body=mhq_request.body,
                                       headers=get_key_value_dict(mhq_request.get_headers()),
                                       params=get_key_value_dict(mhq_request.get_params()),
-                                      response=mhq_response).save()
+                                      response=response).save()
 
-        return Response(mhq_response, status=status.HTTP_200_OK)
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class RequestHistoryViewSet(viewsets.ModelViewSet):
