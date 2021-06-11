@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django_celery_beat.models import IntervalSchedule, ClockedSchedule, CrontabSchedule
 from rest_framework.response import Response
-
+from .tasks import execute_scenario
 from .serializers import ScenarioSerializer, ScheduleSerializer
 from rest_framework import viewsets, status
 from .models import Scenario, ScenarioSchedule, get_default_periodic_task
@@ -12,6 +12,8 @@ from .permissions import ScenarioPermission
 from edge.models import Edge
 from module.models import Module
 from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer
+from rest_framework.permissions import AllowAny
+from .execute import Execution
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
@@ -57,6 +59,16 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         module = get_object_or_404(scenario.get_modules(), id=module_id)
         scenario.starter_module = module
         return Response({'msg': 'set successfully'}, status=status.HTTP_200_OK)
+
+    def execute(self, request, *args, **kwargs):
+        scenario_id = kwargs.get('scenario_id')
+        scenario = get_object_or_404(Scenario, id=scenario_id)
+        exe = Execution(scenario=scenario)
+        response = exe.execute()
+        if len(response) == 2 and isinstance(response[0], Exception):
+            return Response({'msg': response[0].message,
+                             'request': response[1]}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg': exe.response_list, 'path': exe.path}, status=status.HTTP_200_OK)
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

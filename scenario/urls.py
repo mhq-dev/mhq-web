@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/set_starter_module/<int:module_id>/', viewsets.scenario_starter_module),
     path('<int:pk>/schedule/', viewsets.scenario_schedule),
     path('all_modules/<int:scenario_id>', viewsets.all_modules_scenario),
+    path('execute/<int:scenario_id>', viewsets.execute),
 ]

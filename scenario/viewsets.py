@@ -29,3 +29,7 @@ scenario_schedule = ScheduleViewSet.as_view({
     'get': 'get_schedule',
     'put': 'set_schedule',
 })
+
+execute = ScenarioViewSets.as_view({
+    'get': 'execute',
+})
