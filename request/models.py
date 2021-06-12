@@ -68,7 +68,7 @@ class RequestHistory(models.Model):
     params = models.JSONField(null=True, blank=True)
     response = models.JSONField(null=True, blank=True)
 
-    status = models.CharField(max_length=200, default=PENDING, blank=True)
+    status = models.CharField(max_length=200, default=PROGRESS, blank=True)
     type = models.CharField(max_length=200, default=SINGLE, blank=True)
     scenario_history = models.ForeignKey('scenario.ScenarioHistory', null=True, on_delete=models.SET_NULL)
     module = models.ForeignKey('module.Module', null=True, on_delete=models.SET_NULL)

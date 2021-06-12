@@ -4,6 +4,7 @@ from .signals import scenario_history_signal
 from .models import ScenarioHistory
 from datetime import datetime
 
+
 class ScenarioExecution:
     def __init__(self, scenario, user):
         self.scenario = scenario
@@ -25,7 +26,6 @@ class ScenarioExecution:
                                                           execution_request_time=date_time,
                                                           end_execution_time=None,
                                                           schedule=str(self.scenario.schedule))
-        scenario_history.execution_request_time = datetime.now()
 
         scenario_history.save()
 
@@ -52,6 +52,6 @@ class ScenarioExecution:
         scenario_history.end_execution_time = datetime.now()
         scenario_history.save()
         print(
-            f' end time {scenario_history.end_execution_time}, start time : {scenario_history.execution_request_time}')
+            f' end time {scenario_history.end_execution_time}, start time : {scenario_history.start_request_time}')
 
         return final_result

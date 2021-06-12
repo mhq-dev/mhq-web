@@ -2,7 +2,7 @@ import json
 
 from django.db import models
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
-
+from datetime import datetime
 from edge.models import Edge
 from module.models import Module
 
@@ -71,8 +71,8 @@ class ScenarioHistory(models.Model):
     user = models.ForeignKey('authentication.User', null=True, on_delete=models.SET_NULL)
     scenario = models.ForeignKey(Scenario, null=True, on_delete=models.SET_NULL)
     collection = models.ForeignKey('collection.Collection', null=True, on_delete=models.SET_NULL)
-    execution_request_time = models.DateTimeField(auto_now_add=True, blank=True)
-    end_execution_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    start_request_time = models.DateTimeField(default=datetime.now(), blank=True)
+    end_execution_time = models.DateTimeField(default=None, blank=True, null=True)
     schedule = models.CharField(default=ScenarioSchedule.ONCE, max_length=200, null=True)
 
     class Meta:
