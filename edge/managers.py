@@ -1,10 +1,9 @@
 from condition.managers import ConditionManager
-from edge.models import Edge
 
 
 class EdgeManager:
-    def __init__(self, edge_id):
-        self.edge = Edge.objects.get(id=edge_id)
+    def __init__(self, edge):
+        self.edge = edge
 
     def check(self):
         statements = self.edge.get_statements()

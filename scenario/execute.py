@@ -1,3 +1,4 @@
+from edge.managers import EdgeManager
 from edge.models import Edge
 from request.managers import RequestExecution
 from .signals import scenario_history_signal
@@ -10,9 +11,6 @@ class ScenarioExecution:
         self.scenario = scenario
         self.response_list = []
         self.user = user
-
-    def check_statement(self, response, edge):
-        return True
 
     def execute(self):
 
@@ -43,7 +41,7 @@ class ScenarioExecution:
             self.response_list.append((module.id, response))
             edges = Edge.objects.all().filter(source=module)
             for e in edges:
-                if self.check_statement(response, e):
+                if EdgeManager(e).check():
                     stack.append(e.dist)
                     break
         # end of scenario execution
