@@ -170,14 +170,6 @@ EMAIL_HOST_USER = 'talkzone2021@gmail.com'
 EMAIL_HOST_PASSWORD = secret_key_gmail
 EMAIL_USE_TLS = True
 
-CELERY_BROKER_URL = 'redis://redis:6379'
-CELERY_RESULT_BACKEND = 'redis://redis:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Tehran'
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 

@@ -1,7 +1,7 @@
 from mhq_web.celery import app
 from .models import Scenario
 from django.shortcuts import get_object_or_404
-from .execute import Execution
+from .execute import ScenarioExecution
 from request.managers import RequestExecution
 import requests
 

@@ -3,7 +3,7 @@ from request.managers import RequestExecution
 from .signals import scenario_run_finished
 
 
-class Execution:
+class ScenarioExecution:
     def __init__(self, scenario, user):
         self.scenario = scenario
         self.response_list = []
@@ -30,7 +30,7 @@ class Execution:
             self.path.append(req_id)
             edges = Edge.objects.all().filter(source=module)
             for e in edges:
-                if self.check_statement(response, e.dist):
+                if self.check_statement(response, e):
                     stack.append(e.dist)
                     break
         last_response = responses.pop()

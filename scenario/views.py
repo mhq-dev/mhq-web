@@ -12,7 +12,7 @@ from django.shortcuts import get_list_or_404
 from .permissions import ScenarioPermission, ScenarioHistoryPermission
 from edge.models import Edge
 from module.models import Module
-from .execute import Execution
+from .execute import ScenarioExecution
 from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
     ScenarioHistorySerializer
 from .signals import scenario_run_finished
@@ -66,7 +66,7 @@ class ScenarioViewSets(viewsets.ModelViewSet):
     def execute(self, request, *args, **kwargs):
         scenario_id = kwargs.get('scenario_id')
         scenario = get_object_or_404(Scenario, id=scenario_id)
-        exe = Execution(scenario=scenario, user=request.user)
+        exe = ScenarioExecution(scenario=scenario, user=request.user)
         response = exe.execute()
         if len(response) == 2 and isinstance(response[0], Exception):
             return Response({'msg': str(response[0]),
