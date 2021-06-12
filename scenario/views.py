@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django_celery_beat.models import IntervalSchedule, ClockedSchedule, CrontabSchedule
 from rest_framework.response import Response
 
-from .tasks import execute_scenario
+from .tasks import execute
 from .serializers import ScenarioSerializer, ScheduleSerializer, LiteScenarioSerializer
 from rest_framework import viewsets, status
 from .models import Scenario, ScenarioSchedule, get_default_periodic_task, ScenarioHistory
@@ -47,16 +47,18 @@ class ScenarioViewSets(viewsets.ModelViewSet):
     def execute(self, request, *args, **kwargs):
         scenario_id = kwargs.get('pk')
         scenario = get_object_or_404(Scenario, id=scenario_id)
-        exe = ScenarioExecution(scenario=scenario, user=request.user)
-        response = exe.execute()
+
         # with celery
-        # return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)
+        execute.delay(scenario.id, request.user.id)
+        return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)
 
         # without celery
-        if len(response) == 2 and isinstance(response[0], Exception):
-            return Response({'msg': str(response[0]),
-                             'request': str(response[1])}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'msg': exe.response_list}, status=status.HTTP_200_OK)
+        # exe = ScenarioExecution(scenario=scenario, user=request.user)
+        # response = exe.execute()
+        # if len(response) == 2 and isinstance(response[0], Exception):
+        #     return Response({'msg': str(response[0]),
+        #                      'request': str(response[1])}, status=status.HTTP_400_BAD_REQUEST)
+        # return Response({'msg': exe.response_list}, status=status.HTTP_200_OK)
 
 
 class ScenarioHistoryViewSet(viewsets.ModelViewSet):
