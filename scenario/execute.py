@@ -10,7 +10,6 @@ class ScenarioExecution:
         self.scenario = scenario
         self.response_list = []
         self.user = user
-        self.path = []
 
     def check_statement(self, response, edge):
         return True
