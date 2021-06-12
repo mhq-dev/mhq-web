@@ -1,4 +1,5 @@
 from django.db import models
+from edge.models import Edge
 
 
 class Module(models.Model):
@@ -6,6 +7,3 @@ class Module(models.Model):
     request = models.ForeignKey('request.Request', on_delete=models.CASCADE, )
     x_position = models.FloatField()
     y_position = models.FloatField()
-
-    class Meta:
-        db_table = 'module'
