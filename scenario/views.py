@@ -67,7 +67,7 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         scenario = get_object_or_404(Scenario, id=scenario_id)
 
         # with celery
-        execute.delay(scenario, request.user)
+        execute.delay(scenario.id, request.user.id)
         return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)
 
         # without celery
