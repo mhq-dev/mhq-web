@@ -2,13 +2,21 @@ from django.http import JsonResponse
 from django_celery_beat.models import IntervalSchedule, ClockedSchedule, CrontabSchedule
 from rest_framework.response import Response
 
+from .tasks import execute_scenario
 from .serializers import ScenarioSerializer, ScheduleSerializer, LiteScenarioSerializer
 from rest_framework import viewsets, status
-from .models import Scenario, ScenarioSchedule, get_default_periodic_task
+from .models import Scenario, ScenarioSchedule, get_default_periodic_task, ScenarioHistory
 from collection.models import Collection
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
-from .permissions import ScenarioPermission
+from django.shortcuts import get_list_or_404
+from .permissions import ScenarioPermission, ScenarioHistoryPermission
+from edge.models import Edge
+from module.models import Module
+from .execute import ScenarioExecution
+from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
+    ScenarioHistorySerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
@@ -37,6 +45,34 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         collection = get_object_or_404(self.get_collection_queryset(), id=collection_id)
         scenarios = Scenario.objects.filter(collection=collection)
         return JsonResponse(LiteScenarioSerializer(scenarios, many=True).data, safe=False, status=status.HTTP_200_OK)
+
+    def execute(self, request, *args, **kwargs):
+        scenario_id = kwargs.get('pk')
+        scenario = get_object_or_404(Scenario, id=scenario_id)
+        exe = ScenarioExecution(scenario=scenario, user=request.user)
+        response = exe.execute()
+        # with celery
+        # return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)
+
+        # without celery
+        if len(response) == 2 and isinstance(response[0], Exception):
+            return Response({'msg': str(response[0]),
+                             'request': str(response[1])}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg': exe.response_list}, status=status.HTTP_200_OK)
+
+
+class ScenarioHistoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, ScenarioHistoryPermission, ]
+    serializer_class = ScenarioHistorySerializer
+
+    def get_queryset(self):
+        return ScenarioHistory.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        collection_id = kwargs.get('collection_id')
+        scenarios = get_list_or_404(Scenario, collection_id=collection_id)
+        return JsonResponse(ScenarioRelHistorySerializer(scenarios, many=True).data, safe=False,
+                            status=status.HTTP_200_OK)
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

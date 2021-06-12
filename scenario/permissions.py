@@ -1,5 +1,7 @@
 from rest_framework.permissions import BasePermission
 from collection.models import UserCollection, Collection
+from django.shortcuts import get_object_or_404
+from .models import ScenarioHistory
 
 
 class ScenarioPermission(BasePermission):
@@ -26,4 +28,20 @@ class ScenarioPermission(BasePermission):
             if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
                 return False
 
+        return True
+
+
+class ScenarioHistoryPermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            collection = get_object_or_404(Collection, id=view.kwargs.get('collection_id'))
+            if collection.type == Collection.PRIVATE:
+                get_object_or_404(UserCollection, user=request.user, collection=collection)
+            return True
+
+        if request.method == 'DELETE':
+            collection = get_object_or_404(ScenarioHistory, id=view.kwargs.get('pk')).scenario.collection
+            user_collection = get_object_or_404(UserCollection, user=request.user, collection=collection)
+            if user_collection.role == UserCollection.VISITOR:
+                return False
         return True
