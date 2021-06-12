@@ -1,15 +1,16 @@
+from authentication.models import User
 from edge.models import Edge
 from request.managers import RequestExecution
 from .signals import scenario_history_signal
-from .models import ScenarioHistory
+from .models import ScenarioHistory, Scenario
 from datetime import datetime
 
 
 class ScenarioExecution:
-    def __init__(self, scenario, user):
-        self.scenario = scenario
+    def __init__(self, scenario_id, user_id):
+        self.scenario = Scenario.objects.get(id=scenario_id)
         self.response_list = []
-        self.user = user
+        self.user = User.objects.get(id=user_id)
 
     def check_statement(self, response, edge):
         return True

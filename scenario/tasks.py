@@ -3,6 +3,6 @@ from .execute import ScenarioExecution
 
 
 @app.task
-def execute(scenario, user):
-    exe = ScenarioExecution(scenario=scenario, user=user)
+def execute(scenario_id, user_id):
+    exe = ScenarioExecution(scenario_id=scenario_id, user_id=user_id)
     exe.execute()
