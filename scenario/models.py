@@ -71,7 +71,7 @@ class ScenarioHistory(models.Model):
     user = models.ForeignKey('authentication.User', null=True, on_delete=models.SET_NULL)
     scenario = models.ForeignKey(Scenario, null=True, on_delete=models.SET_NULL)
     collection = models.ForeignKey('collection.Collection', null=True, on_delete=models.SET_NULL)
-    start_request_time = models.DateTimeField(default=datetime.now(), blank=True)
+    start_request_time = models.DateTimeField(auto_now_add=True, blank=True)
     end_execution_time = models.DateTimeField(default=None, blank=True, null=True)
     schedule = models.CharField(default=ScenarioSchedule.ONCE, max_length=200, null=True)
 
