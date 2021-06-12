@@ -11,10 +11,8 @@ from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from django.shortcuts import get_list_or_404
 from .permissions import ScenarioPermission, ScenarioHistoryPermission
-from edge.models import Edge
-from module.models import Module
 from .execute import ScenarioExecution
-from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
+from .serializers import ScenarioRelHistorySerializer, \
     ScenarioHistorySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
