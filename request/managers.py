@@ -16,9 +16,11 @@ def get_key_value_dict(key_values):
 
 class RequestExecution:
 
-    def __init__(self, request, user):
+    def __init__(self, request, user, module, scenario_history=None):
         self.request = request
         self.user = user
+        self.scenario_history = scenario_history
+        self.module = module
 
     def get(self):
 
@@ -45,6 +47,23 @@ class RequestExecution:
                                )
 
     def execute(self):
+
+        # create request_history object
+        # TODO move to signal file
+        type = RequestHistory.SINGLE if self.scenario_history is None else RequestHistory.SCENARIO
+        mhq_request = RequestHistory.objects.create(user=self.user,
+                                                    name=self.request.name,
+                                                    http_method=self.request.http_method,
+                                                    url=self.request.url,
+                                                    body=self.request.body,
+                                                    headers=get_key_value_dict(self.request.get_headers()),
+                                                    params=get_key_value_dict(self.request.get_params()),
+                                                    module=self.module,
+                                                    type=type,
+                                                    scenario_history=self.scenario_history)
+        mhq_request.save()
+
+        # execute
         method_types = {'get': self.get, 'post': self.post, 'put': self.put, 'delete': self.delete}
 
         try:
@@ -63,13 +82,7 @@ class RequestExecution:
             "cookies": dict(result.cookies),
             "body": result_body,
         }
-        req = RequestHistory.objects.create(user=self.user,
-                                            name=self.request.name,
-                                            http_method=self.request.http_method,
-                                            url=self.request.url,
-                                            body=self.request.body,
-                                            headers=get_key_value_dict(self.request.get_headers()),
-                                            params=get_key_value_dict(self.request.get_params()),
-                                            response=response)
-        req.save()
-        return response, req.id
+        mhq_request.response = response
+        mhq_request.save()
+
+        return response

@@ -115,14 +115,6 @@ class ScenarioHistorySerializer(serializers.ModelSerializer):
         model = ScenarioHistory
         fields = '__all__'
 
-    def validate(self, attrs):
-        if len(attrs['order']) == 0 and ('schedule' not in attrs):
-            raise serializers.ValidationError('you should pass order or schedule')
-        if len(attrs['order']) != 0:
-            for o in attrs['order']:
-                # TODO delete the below line
-                get_object_or_404(RequestHistory, id=o)
-
 
 class ScenarioRelHistorySerializer(serializers.ModelSerializer):
     scenario_histories = ScenarioHistorySerializer(source='get_scenario_history', many=True, read_only=True)

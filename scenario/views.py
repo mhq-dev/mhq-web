@@ -15,7 +15,6 @@ from module.models import Module
 from .execute import ScenarioExecution
 from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
     ScenarioHistorySerializer
-from .signals import scenario_run_finished
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
@@ -64,14 +63,18 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         return Response({'msg': 'set successfully'}, status=status.HTTP_200_OK)
 
     def execute(self, request, *args, **kwargs):
-        scenario_id = kwargs.get('scenario_id')
+        scenario_id = kwargs.get('pk')
         scenario = get_object_or_404(Scenario, id=scenario_id)
         exe = ScenarioExecution(scenario=scenario, user=request.user)
         response = exe.execute()
+        # with celery
+        # return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)
+
+        # without celery
         if len(response) == 2 and isinstance(response[0], Exception):
             return Response({'msg': str(response[0]),
                              'request': str(response[1])}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'msg': exe.response_list, 'path': exe.path}, status=status.HTTP_200_OK)
+        return Response({'msg': exe.response_list}, status=status.HTTP_200_OK)
 
 
 class ScenarioHistoryViewSet(viewsets.ModelViewSet):
