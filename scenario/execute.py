@@ -23,9 +23,8 @@ class ScenarioExecution:
                                                           user=self.user,
                                                           scenario=self.scenario,
                                                           collection=self.scenario.collection,
-                                                          execution_request_time=date_time,
                                                           end_execution_time=None,
-                                                          schedule=str(self.scenario.schedule))
+                                                          schedule=str(self.scenario.schedule.periodic_task))
 
         scenario_history.save()
 
