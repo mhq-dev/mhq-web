@@ -4,7 +4,6 @@ from .signals import scenario_history_signal
 from .models import ScenarioHistory
 from datetime import datetime
 
-
 class ScenarioExecution:
     def __init__(self, scenario, user):
         self.scenario = scenario
@@ -18,12 +17,15 @@ class ScenarioExecution:
     def execute(self):
 
         # create scenario_history object
+        date_time = datetime.now()
         scenario_history = ScenarioHistory.objects.create(name=self.scenario.name,
                                                           user=self.user,
                                                           scenario=self.scenario,
                                                           collection=self.scenario.collection,
+                                                          execution_request_time=date_time,
                                                           end_execution_time=None,
                                                           schedule=str(self.scenario.schedule))
+        scenario_history.execution_request_time = datetime.now()
 
         scenario_history.save()
 
