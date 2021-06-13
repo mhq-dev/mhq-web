@@ -7,6 +7,7 @@ urlpatterns = [
     path('<int:pk>/', viewsets.scenario_detail),
     path('<int:pk>/schedule/', viewsets.scenario_schedule),
     path('<int:pk>/execute/', viewsets.execute),
-    path('history/<int:pk>/', viewsets.scenario_history_delete),
-    path('history/alls/<int:collection_id>/', viewsets.scenario_history_get_list),
+    path('<int:pk>/history/', viewsets.scenario_history),
+    path('collection/<int:collection_id>/history/', viewsets.scenario_collection_history),
+    path('history/', viewsets.scenario_history_list)
 ]

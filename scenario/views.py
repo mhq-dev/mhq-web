@@ -10,11 +10,9 @@ from collection.models import Collection
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from django.shortcuts import get_list_or_404
-from .permissions import ScenarioPermission, ScenarioHistoryPermission
-from .execute import ScenarioExecution
-from .serializers import ScenarioRelHistorySerializer, \
-    ScenarioHistorySerializer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import ScenarioPermission
+from .serializers import ScenarioHistorySerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
@@ -35,7 +33,9 @@ class ScenarioViewSets(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         scenario = serializer.save()
-        scenario.schedule = ScenarioSchedule.objects.create(periodic_task=get_default_periodic_task(scenario))
+        scenario.schedule = ScenarioSchedule.objects.create(
+            periodic_task=get_default_periodic_task(scenario, self.request.user)
+        )
         scenario.save()
 
     def list(self, request, *args, **kwargs):
@@ -44,9 +44,8 @@ class ScenarioViewSets(viewsets.ModelViewSet):
         scenarios = Scenario.objects.filter(collection=collection)
         return JsonResponse(LiteScenarioSerializer(scenarios, many=True).data, safe=False, status=status.HTTP_200_OK)
 
-    def execute(self, request, *args, **kwargs):
-        scenario_id = kwargs.get('pk')
-        scenario = get_object_or_404(Scenario, id=scenario_id)
+    def execute(self, request, pk):
+        scenario = get_object_or_404(Scenario, id=pk)
 
         # with celery
         execute.delay(scenario.id, request.user.id)
@@ -62,17 +61,21 @@ class ScenarioViewSets(viewsets.ModelViewSet):
 
 
 class ScenarioHistoryViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ScenarioHistoryPermission, ]
+    permission_classes = [IsAuthenticated, ]
     serializer_class = ScenarioHistorySerializer
 
     def get_queryset(self):
-        return ScenarioHistory.objects.all()
+        return ScenarioHistory.objects.all().filter(
+            Q(collection__isnull=False) &
+            Q(collection__usercollection__user=self.request.user)
+        ).distinct()
 
-    def list(self, request, *args, **kwargs):
-        collection_id = kwargs.get('collection_id')
-        scenarios = get_list_or_404(Scenario, collection_id=collection_id)
-        return JsonResponse(ScenarioRelHistorySerializer(scenarios, many=True).data, safe=False,
-                            status=status.HTTP_200_OK)
+    def list_with_collection(self, request, collection_id):
+        scenario_histories = get_list_or_404(self.get_queryset(), collection_id=collection_id)
+        return JsonResponse(self.get_serializer(scenario_histories, many=True).data,
+                            safe=False, status=status.HTTP_200_OK)
+
+    # TODO all request histories for a scenario history
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

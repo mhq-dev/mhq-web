@@ -17,12 +17,13 @@ class ScenarioExecution:
 
     def execute(self):
 
-        scenario_history = ScenarioHistory.objects.create(name=self.scenario.name,
-                                                          user=self.user,
-                                                          scenario=self.scenario,
-                                                          collection=self.scenario.collection,
-                                                          schedule=str(self.scenario.schedule.periodic_task))
-        scenario_history.save()
+        scenario_history = ScenarioHistory.objects.create(
+            name=self.scenario.name,
+            user=self.user,
+            scenario=self.scenario,
+            collection=self.scenario.collection,
+            schedule=str(self.scenario.schedule.periodic_task)
+        ).save()
 
         start = self.scenario.starter_module
         stack = [start]

@@ -58,7 +58,7 @@ class RequestHistoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
-        return RequestHistory.objects.all().filter(user=self.request.user)
+        return RequestHistory.objects.all().filter(user=self.request.user, type=RequestHistory.SINGLE)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

@@ -23,11 +23,14 @@ execute = ScenarioViewSets.as_view({
     'get': 'execute',
 })
 
-
-scenario_history_get_list = ScenarioHistoryViewSet.as_view({
-    'get': 'list',
+scenario_history = ScenarioHistoryViewSet.as_view({
+    'get': 'retrieve'
 })
 
-scenario_history_delete = ScenarioHistoryViewSet.as_view({
-    'delete': 'destroy'
+scenario_collection_history = ScenarioHistoryViewSet.as_view({
+    'get': 'list_with_collection',
+})
+
+scenario_history_list = ScenarioHistoryViewSet.as_view({
+    'get': 'list',
 })
