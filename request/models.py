@@ -70,8 +70,9 @@ class RequestHistory(models.Model):
 
     status = models.CharField(max_length=200, default=PROGRESS, blank=True)
     type = models.CharField(max_length=200, default=SINGLE, blank=True)
-    scenario_history = models.ForeignKey('scenario.ScenarioHistory', null=True, on_delete=models.SET_NULL)
-    module = models.ForeignKey('module.Module', null=True, on_delete=models.SET_NULL)
+    scenario_history = models.ForeignKey('scenario.ScenarioHistory', null=True,
+                                         on_delete=models.SET_NULL, blank=True)
+    module = models.ForeignKey('module.Module', null=True, on_delete=models.SET_NULL, blank=True)
 
     class Meta:
         db_table = 'request_histories'
