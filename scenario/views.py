@@ -73,8 +73,13 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
             Q(collection__usercollection__user=self.request.user)
         ).distinct()
 
+    def retrieve(self, request, *args, **kwargs):
+        scenario_histories = get_list_or_404(self.get_queryset(), scenario__id=kwargs.get('pk'))
+        serializer = self.get_serializer(scenario_histories, many=True)
+        return Response(serializer.data)
+
     def list_with_collection(self, request, collection_id):
-        scenario_histories = get_list_or_404(self.get_queryset(), collection_id=collection_id)
+        scenario_histories = get_list_or_404(self.get_queryset(), collection__id=collection_id)
         return JsonResponse(self.get_serializer(scenario_histories, many=True).data,
                             safe=False, status=status.HTTP_200_OK)
 

@@ -9,7 +9,10 @@ class EdgeManager:
     def check(self):
         statements = self.edge.get_statements()
 
-        result = True
+        if len(statements) == 0:
+            return True
+
+        result = False
         for statement in statements:
             result = result or self.check_statement(statement)
 

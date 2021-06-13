@@ -103,4 +103,5 @@ class ScheduleSerializer(serializers.ModelSerializer):
 class ScenarioHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ScenarioHistory
-        fields = '__all__'
+        fields = ['name', 'user', 'scenario', 'collection',
+                  'start_request_time', 'end_execution_time', 'schedule', ]

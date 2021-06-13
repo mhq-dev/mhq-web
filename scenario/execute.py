@@ -23,7 +23,8 @@ class ScenarioExecution:
             scenario=self.scenario,
             collection=self.scenario.collection,
             schedule=str(self.scenario.schedule.periodic_task)
-        ).save()
+        )
+        scenario_history.save()
 
         start = self.scenario.starter_module
         stack = [start]
@@ -41,7 +42,6 @@ class ScenarioExecution:
             for e in edges:
                 if EdgeManager(e, scenario_history).check():
                     stack.append(e.dist)
-                    break
 
         self.finish(scenario_history=scenario_history)
 

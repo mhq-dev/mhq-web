@@ -42,7 +42,7 @@ class ConditionManager:
         condition_types = {Condition.EQUAL: self.equal, Condition.EXIST: self.exist,
                            Condition.START_WITH: self.start_with, Condition.CONTAINS: self.contains}
 
-        var1 = token_types[self.condition.first_token]()
-        var2 = token_types[self.condition.second_token]()
+        var1 = token_types[self.condition.first_token](self.condition.first)
+        var2 = token_types[self.condition.second_token](self.condition.second)
 
         return condition_types[self.condition.operator](var1, var2)
