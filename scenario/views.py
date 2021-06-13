@@ -47,6 +47,9 @@ class ScenarioViewSets(viewsets.ModelViewSet):
     def execute(self, request, pk):
         scenario = get_object_or_404(Scenario, id=pk)
 
+        if scenario.starter_module is None:
+            return Response({'msg': 'you should set starter module first!'}, status=status.HTTP_404_NOT_FOUND)
+
         # with celery
         execute.delay(scenario.id, request.user.id)
         return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)

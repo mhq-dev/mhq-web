@@ -3,8 +3,8 @@ from condition.models import Condition
 
 
 class Edge(models.Model):
-    source = models.ForeignKey('module.Module', on_delete=models.CASCADE, related_name='source')
-    dist = models.ForeignKey('module.Module', on_delete=models.CASCADE, related_name='dist')
+    source = models.ForeignKey('module.Module', on_delete=models.CASCADE, related_name='source', blank=True)
+    dist = models.ForeignKey('module.Module', on_delete=models.CASCADE, related_name='dist', blank=True)
 
     def get_statements(self):
         return Statement.objects.all().filter(edge__id=self.id)
@@ -15,11 +15,10 @@ class Edge(models.Model):
 
 
 class Statement(models.Model):
-    name = models.CharField(max_length=150, blank=True)
     edge = models.ForeignKey(Edge, on_delete=models.CASCADE, related_name='statement_of')
+
+    def get_conditions(self):
+        return Condition.objects.all().filter(statement__id=self.id)
 
     class Meta:
         db_table = 'statements'
-
-    def get_conditions(self):
-        return Condition.objects.all().filter(statement__=self.id)
