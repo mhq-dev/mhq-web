@@ -1,8 +1,8 @@
 from mhq_web.celery import app
-from scenario.models import Scenario
+from .execute import ScenarioExecution
 
 
 @app.task
-def execute(scenario_id):
-    scenario = Scenario.objects.get(id=scenario_id)
-    print('Hi')
+def execute(scenario_id, user_id):
+    exe = ScenarioExecution(scenario_id=scenario_id, user_id=user_id)
+    exe.execute()

@@ -50,6 +50,14 @@ class KeyValueContainer(models.Model):
 
 
 class RequestHistory(models.Model):
+    COMPLETED = 'completed'
+    PENDING = 'pending'
+    PROGRESS = 'progress'
+    FAILED = 'failed'
+
+    SINGLE = 'single'
+    SCENARIO = 'scenario'
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     execution_time = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=255, blank=True)
@@ -59,3 +67,12 @@ class RequestHistory(models.Model):
     headers = models.JSONField(null=True, blank=True)
     params = models.JSONField(null=True, blank=True)
     response = models.JSONField(null=True, blank=True)
+
+    status = models.CharField(max_length=200, default=PROGRESS, blank=True)
+    type = models.CharField(max_length=200, default=SINGLE, blank=True)
+    scenario_history = models.ForeignKey('scenario.ScenarioHistory', null=True,
+                                         on_delete=models.SET_NULL, blank=True)
+    module = models.ForeignKey('module.Module', null=True, on_delete=models.SET_NULL, blank=True)
+
+    class Meta:
+        db_table = 'request_histories'
