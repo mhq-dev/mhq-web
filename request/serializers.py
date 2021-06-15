@@ -108,4 +108,5 @@ class RequestHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestHistory
-        fields = '__all__'
+        fields = ['user', 'execution_time', 'name', 'http_method', 'url',
+                  'body', 'headers', 'params', 'response', 'status', 'type']

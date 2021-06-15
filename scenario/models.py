@@ -8,8 +8,8 @@ from module.models import Module
 
 
 class Scenario(models.Model):
-    name = models.CharField(max_length=100)
-    collection = models.ForeignKey('collection.Collection', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, blank=True)
+    collection = models.ForeignKey('collection.Collection', on_delete=models.CASCADE, blank=True)
     starter_module = models.OneToOneField('module.Module',
                                           on_delete=models.DO_NOTHING,
                                           null=True,
@@ -23,6 +23,9 @@ class Scenario(models.Model):
     def get_modules(self):
         return Module.objects.all().filter(scenario__id=self.id)
 
+    def get_edges(self):
+        return Edge.objects.all().filter(source__scenario__id=self.id)
+
     class Meta:
         db_table = 'scenarios'
 
@@ -30,16 +33,16 @@ class Scenario(models.Model):
         return ScenarioHistory.objects.all().filter(scenario=self)
 
 
-def get_default_periodic_task(scenario):
+def get_default_periodic_task(scenario, user):
     interval, temp = IntervalSchedule.objects.get_or_create(
         every=15,
         period=IntervalSchedule.MINUTES)
     return PeriodicTask.objects.create(
         enabled=False,
         interval=interval,
-        name='scenario_' + scenario.name + '_schedule',
+        name='scenario_' + str(scenario.id) + '_' + scenario.name + '_schedule',
         task='scenario.tasks.execute',
-        args=json.dumps([scenario.id])
+        args=json.dumps([scenario.id, user.id])
     )
 
 

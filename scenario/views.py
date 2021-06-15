@@ -1,21 +1,18 @@
 from django.http import JsonResponse
 from django_celery_beat.models import IntervalSchedule, ClockedSchedule, CrontabSchedule
 from rest_framework.response import Response
+
 from .tasks import execute
-from .serializers import ScenarioSerializer, ScheduleSerializer
+from .serializers import ScenarioSerializer, ScheduleSerializer, LiteScenarioSerializer
 from rest_framework import viewsets, status
 from .models import Scenario, ScenarioSchedule, get_default_periodic_task, ScenarioHistory
 from collection.models import Collection
 from django.db.models import Q
 from rest_framework.generics import get_object_or_404
 from django.shortcuts import get_list_or_404
-from .permissions import ScenarioPermission, ScenarioHistoryPermission
-from edge.models import Edge
-from module.models import Module
-from .execute import ScenarioExecution
-from .serializers import SpecificEdgeSerializer, ModuleScenarioSerializer, ScenarioRelHistorySerializer, \
-    ScenarioHistorySerializer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import ScenarioPermission
+from .serializers import ScenarioHistorySerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class ScenarioViewSets(viewsets.ModelViewSet):
@@ -28,43 +25,30 @@ class ScenarioViewSets(viewsets.ModelViewSet):
                                                  | Q(collection__usercollection__user=self.request.user)).distinct()
         return Scenario.objects.all().filter(collection__type=Collection.PUBLIC)
 
+    def get_collection_queryset(self):
+        if self.request.user.is_authenticated:
+            return Collection.objects.all().filter(Q(type=Collection.PUBLIC)
+                                                   | Q(usercollection__user=self.request.user)).distinct()
+        return Collection.objects.all().filter(Q(type=Collection.PUBLIC))
+
     def perform_create(self, serializer):
         scenario = serializer.save()
-        scenario.schedule = ScenarioSchedule.objects.create(periodic_task=get_default_periodic_task(scenario))
+        scenario.schedule = ScenarioSchedule.objects.create(
+            periodic_task=get_default_periodic_task(scenario, self.request.user)
+        )
         scenario.save()
 
     def list(self, request, *args, **kwargs):
         collection_id = kwargs.get('collection_id')
-        collection = get_object_or_404(Collection, id=collection_id)
+        collection = get_object_or_404(self.get_collection_queryset(), id=collection_id)
         scenarios = Scenario.objects.filter(collection=collection)
-        return JsonResponse(ScenarioSerializer(scenarios, many=True).data, safe=False, status=status.HTTP_200_OK)
+        return JsonResponse(LiteScenarioSerializer(scenarios, many=True).data, safe=False, status=status.HTTP_200_OK)
 
-    def retrieve(self, request, *args, **kwargs):
-        collection_id = kwargs.get('collection_id')
-        scenario_id = kwargs.get('scenario_id')
-        collection = get_object_or_404(Collection, id=collection_id)
-        scenario = get_object_or_404(Scenario, collection=collection, id=scenario_id)
-        edges = Edge.objects.all().filter(source__scenario=scenario)
-        node_num = len(Module.objects.all().filter(scenario=scenario))
-        return JsonResponse({'node_count': node_num,
-                             'edges': SpecificEdgeSerializer(edges, many=True).data}, safe=False,
-                            status=status.HTTP_200_OK)
-
-    def get_module_of_scenario(self, request, *args, **kwargs):
-        return JsonResponse(
-            ModuleScenarioSerializer(Module.objects.all().filter(scenario_id=kwargs.get('scenario_id')),
-                                     many=True).data,
-            safe=False, status=status.HTTP_200_OK)
-
-    def set_starter_module(self, request, pk, module_id):
+    def execute(self, request, pk):
         scenario = get_object_or_404(Scenario, id=pk)
-        module = get_object_or_404(scenario.get_modules(), id=module_id)
-        scenario.starter_module = module
-        return Response({'msg': 'set successfully'}, status=status.HTTP_200_OK)
 
-    def execute(self, request, *args, **kwargs):
-        scenario_id = kwargs.get('pk')
-        scenario = get_object_or_404(Scenario, id=scenario_id)
+        if scenario.starter_module is None:
+            return Response({'msg': 'you should set starter module first!'}, status=status.HTTP_404_NOT_FOUND)
 
         # with celery
         execute.delay(scenario.id, request.user.id)
@@ -80,17 +64,26 @@ class ScenarioViewSets(viewsets.ModelViewSet):
 
 
 class ScenarioHistoryViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ScenarioHistoryPermission, ]
+    permission_classes = [IsAuthenticated, ]
     serializer_class = ScenarioHistorySerializer
 
     def get_queryset(self):
-        return ScenarioHistory.objects.all()
+        return ScenarioHistory.objects.all().filter(
+            Q(collection__isnull=False) &
+            Q(collection__usercollection__user=self.request.user)
+        ).distinct()
 
-    def list(self, request, *args, **kwargs):
-        collection_id = kwargs.get('collection_id')
-        scenarios = get_list_or_404(Scenario, collection_id=collection_id)
-        return JsonResponse(ScenarioRelHistorySerializer(scenarios, many=True).data, safe=False,
-                            status=status.HTTP_200_OK)
+    def retrieve(self, request, *args, **kwargs):
+        scenario_histories = get_list_or_404(self.get_queryset(), scenario__id=kwargs.get('pk'))
+        serializer = self.get_serializer(scenario_histories, many=True)
+        return Response(serializer.data)
+
+    def list_with_collection(self, request, collection_id):
+        scenario_histories = get_list_or_404(self.get_queryset(), collection__id=collection_id)
+        return JsonResponse(self.get_serializer(scenario_histories, many=True).data,
+                            safe=False, status=status.HTTP_200_OK)
+
+    # TODO all request histories for a scenario history
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

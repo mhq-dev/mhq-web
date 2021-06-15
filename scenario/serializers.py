@@ -3,10 +3,7 @@ from .models import Scenario, ScenarioSchedule
 from collection.models import Collection
 from module.models import Module
 from edge.models import Edge
-from condition.models import Condition
 from .models import ScenarioHistory
-from request.models import RequestHistory
-from django.shortcuts import get_object_or_404
 
 
 class CollectionScenarioSerializer(serializers.ModelSerializer):
@@ -25,32 +22,31 @@ class SpecificModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'name', 'x_position', 'y_position']
-
-
-class ConditionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Condition
-        fields = '__all__'
+        fields = ['id', 'request', 'name', 'x_position', 'y_position']
 
 
 class SpecificEdgeSerializer(serializers.ModelSerializer):
-    source = SpecificModuleSerializer(source='get_source', read_only=True)
-    dist = SpecificModuleSerializer(source='get_dist', read_only=True)
-    condition = ConditionSerializer(source='statement_of.get_condition', read_only=True, many=True)
-
     class Meta:
         model = Edge
-        fields = ['source', 'dist', 'condition']
+        fields = ['id', 'source', 'dist']
 
 
 class ScenarioSerializer(serializers.ModelSerializer):
     collection = CollectionScenarioSerializer(required=False)
-    starter_module = SpecificModuleSerializer(read_only=True)
+    edges = SpecificEdgeSerializer(source='get_edges', many=True, read_only=True, required=False)
+    nodes = SpecificModuleSerializer(source='get_modules', many=True, read_only=True, required=False)
 
     class Meta:
         model = Scenario
-        fields = ['id', 'name', 'collection', 'starter_module']
+        fields = ['id', 'name', 'collection', 'starter_module', 'edges', 'nodes']
+
+
+class LiteScenarioSerializer(serializers.ModelSerializer):
+    collection = CollectionScenarioSerializer(required=False)
+
+    class Meta:
+        model = Scenario
+        fields = ['id', 'name', 'collection']
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -104,21 +100,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
         return months
 
 
-class ModuleScenarioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Module
-        fields = ['id', 'request', 'x_position', 'y_position']
-
-
 class ScenarioHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ScenarioHistory
-        fields = '__all__'
-
-
-class ScenarioRelHistorySerializer(serializers.ModelSerializer):
-    scenario_histories = ScenarioHistorySerializer(source='get_scenario_history', many=True, read_only=True)
-
-    class Meta:
-        model = Scenario
-        fields = ['scenario_histories', ]
+        fields = ['name', 'user', 'scenario', 'collection',
+                  'start_request_time', 'end_execution_time', 'schedule', ]
