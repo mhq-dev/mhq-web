@@ -109,35 +109,6 @@ class EdgeViewSetTestCase(APITestCase):
         self.assertEqual(len(response.json()['statements']), 2)
         self.assertEqual(len(response.json()['statements'][0]['conditions']), 2)
         self.assertEqual(len(response.json()['statements'][1]['conditions']), 1)
-        response = self.client.post(reverse('edge-create'), json.dumps({
-            'source': self.node1.id,
-            'dist': self.node4.id,
-            'statements': [
-                {
-                    'conditions': [
-                        {
-                            'first': 'hi',
-                            'second': 'hi'
-                        },
-                        {
-                            'operator': 'exist',
-                            'first': 'hi',
-                            'second': 'bye'
-                        }
-                    ]
-                },
-                {
-                    'conditions': [
-                        {
-                            'first_toke': 'num',
-                            'first': '12',
-                            'second_token': 'timestamp',
-                            'second': '2021-06-17T20:48:50.451419+04:30'
-                        }
-                    ]
-                }
-            ]
-        }), content_type='application/json')
 
     def test_edge_detail(self):
         response = self.client.get(reverse('edge_detail', kwargs={'pk': self.edge1.id}))
@@ -181,7 +152,7 @@ class EdgeViewSetTestCase(APITestCase):
         response = self.client.put(reverse('edge_detail', kwargs={'pk': self.edge1.id}), json.dumps({
             'statements': [
                 {
-                    'conditions':[]
+                    'conditions': []
                 }
             ]
         }), content_type='application/json')
