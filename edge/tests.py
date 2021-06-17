@@ -199,8 +199,8 @@ class EdgeManagerTestCase(APITestCase):
         self.token = Token.objects.create(user=self.user)
 
     def generate_basic_database(self):
-        self.user = User.objects.create_user(username="amirh")
-        self.collection = Collection.objects.create(type='public', name='edge_test')
+        self.user = User.objects.create_user(username="sadra")
+        self.collection = Collection.objects.create(type='public', name='edge_manager_test')
         self.user_collection = UserCollection.objects.create(
             role='owner',
             user=self.user,
@@ -208,12 +208,12 @@ class EdgeManagerTestCase(APITestCase):
         )
         self.req = Request.objects.create(
             collection=self.collection,
-            name='edge_test_request',
+            name='edge_manager_test_request',
             http_method=Request.GET,
             url='https://6094a286f082a4001736b248.mockapi.io/api/furit'
         )
         self.scenario = Scenario.objects.create(
-            name='edge_test_scenario',
+            name='edge_manager_test_scenario',
             collection=self.collection
         )
         self.node1 = Module.objects.create(scenario=self.scenario, request=self.req)
