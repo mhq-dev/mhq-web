@@ -7,17 +7,22 @@ from datetime import datetime
 
 
 class ScenarioExecution:
-    def __init__(self, scenario_id, user_id):
+    def __init__(self, scenario_id, user_id, scenario_history_id=None):
         self.scenario = Scenario.objects.get(id=scenario_id)
         self.user = User.objects.get(id=user_id)
-        self.scenario_history = ScenarioHistory.objects.create(
-            name=self.scenario.name,
-            user=self.user,
-            scenario=self.scenario,
-            collection=self.scenario.collection,
-            schedule=str(self.scenario.schedule.periodic_task)
-        )
-        self.scenario_history.save()
+        if scenario_history_id:
+            self.scenario_history = ScenarioHistory.objects.get(
+                id=scenario_history_id
+            )
+        else:
+            self.scenario_history = ScenarioHistory.objects.create(
+                name=self.scenario.name,
+                user=self.user,
+                scenario=self.scenario,
+                collection=self.scenario.collection,
+                schedule=str(self.scenario.schedule.periodic_task)
+            )
+            self.scenario_history.save()
 
     def finish(self):
         self.scenario_history.end_execution_time = datetime.now()

@@ -52,8 +52,17 @@ class ScenarioViewSets(viewsets.ModelViewSet):
             return Response({'msg': 'you should set starter module first!'}, status=status.HTTP_404_NOT_FOUND)
 
         # with celery
-        execute.delay(scenario.id, request.user.id)
-        return Response({'msg': 'your request submitted'}, status=status.HTTP_200_OK)
+        scenario_history = ScenarioHistory.objects.create(
+            name=scenario.name,
+            user=request.user,
+            scenario=scenario,
+            collection=scenario.collection,
+            schedule=str(scenario.schedule.periodic_task)
+        )
+        scenario_history.save()
+
+        execute.delay(scenario.id, request.user.id, scenario_history.id)
+        return Response({'scenario_history': scenario_history.id}, status=status.HTTP_200_OK)
 
         # without celery
         # exe = ScenarioExecution(scenario=scenario, user=request.user)
@@ -94,6 +103,11 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
         scenario_histories = get_list_or_404(self.get_queryset(), scenario__id=kwargs.get('pk'))
         response = self.get_paginated_response(scenario_histories)
         serializer = self.get_serializer(response, many=True)
+        return Response(serializer.data)
+
+    def retrieve_with_history_id(self, request, scenario_history_id):
+        instance = get_object_or_404(self.get_queryset(), id=scenario_history_id)
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def list_with_collection(self, request, collection_id):

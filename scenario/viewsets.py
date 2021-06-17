@@ -27,6 +27,10 @@ scenario_history = ScenarioHistoryViewSet.as_view({
     'get': 'retrieve'
 })
 
+scenario_history_with_id = ScenarioHistoryViewSet.as_view({
+    'get': 'retrieve_with_history_id'
+})
+
 scenario_collection_history = ScenarioHistoryViewSet.as_view({
     'get': 'list_with_collection',
 })
