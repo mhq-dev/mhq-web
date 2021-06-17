@@ -3,12 +3,13 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from collection.models import Collection
-from .serializers import StatementSerializer, EdgeSerializer
-from .models import Edge, Statement
+from .permissions import EdgePermissions
+from .serializers import EdgeSerializer
+from .models import Edge
 
 
 class EdgeViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, EdgePermissions, ]
     serializer_class = EdgeSerializer
 
     def get_queryset(self):

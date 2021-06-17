@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from request.models import RequestHistory
 from .models import Scenario, ScenarioSchedule
 from collection.models import Collection
 from module.models import Module
@@ -100,8 +102,17 @@ class ScheduleSerializer(serializers.ModelSerializer):
         return months
 
 
+class ScenarioRequestHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestHistory
+        fields = ['execution_time', 'name', 'http_method', 'url', 'body',
+                  'headers', 'params', 'response', 'status', 'module']
+
+
 class ScenarioHistorySerializer(serializers.ModelSerializer):
+    requests = ScenarioRequestHistorySerializer(source='get_request_histories', many=True, required=False)
+
     class Meta:
         model = ScenarioHistory
-        fields = ['name', 'user', 'scenario', 'collection',
-                  'start_request_time', 'end_execution_time', 'schedule', ]
+        fields = ['name', 'user', 'scenario', 'collection', 'start_execution_time',
+                  'end_execution_time', 'schedule', 'status', 'requests']

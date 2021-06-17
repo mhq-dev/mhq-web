@@ -1,33 +1,39 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission
 from collection.models import UserCollection
-from django.shortcuts import get_object_or_404
 
 from module.models import Module
-from .models import Edge
-from scenario.models import Scenario
 
 
 class EdgePermissions(BasePermission):
+
     def has_object_permission(self, request, view, obj):
-        user = get_object_or_404(UserCollection, user=request.user, collection=obj.source.scenario.collection)
-        if user.role == UserCollection.VISITOR:
-            return False
+        if view.action == 'update' or view.action == 'destroy':
+            user_collection = UserCollection.objects.filter(
+                user=request.user, collection=obj.source.scenario.collection
+            )
+            if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
+                return False
+
         return True
 
     def has_permission(self, request, view):
-        if request.method == 'POST':
-            module_source = get_object_or_404(Module, id=request.data['source'])
-            collection_id = module_source.scenario.collection
-            user_collection = get_object_or_404(UserCollection, user=request.user,
-                                                collection=collection_id)
-            if user_collection.role == UserCollection.VISITOR:
+        if view.action == 'update' or view.action == 'destroy' or view.action == 'create':
+            if not request.user.is_authenticated:
                 return False
-        if request.method == 'GET':
-            collection = get_object_or_404(Edge, id=view.kwargs['id']).source.scenario.collection
-            if collection.type == 'public':
-                return True
-            user_collection = get_object_or_404(UserCollection, user=request.user,
-                                                collection=collection)
-            if user_collection.role == UserCollection.VISITOR:
+
+        if view.action == 'create':
+            # TODO find better idea for this
+            if 'source' not in request.data or 'dist' not in request.data:
                 return False
+
+            source = Module.objects.filter(id=request.data['source'])
+            if len(source) == 0:
+                return False
+
+            user_collection = UserCollection.objects.filter(
+                user=request.user, collection=source[0].scenario.collection
+            )
+            if len(user_collection) == 0 or user_collection[0].role == UserCollection.VISITOR:
+                return False
+
         return True

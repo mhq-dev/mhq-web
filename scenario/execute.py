@@ -10,21 +10,22 @@ class ScenarioExecution:
     def __init__(self, scenario_id, user_id):
         self.scenario = Scenario.objects.get(id=scenario_id)
         self.user = User.objects.get(id=user_id)
-
-    def finish(self, scenario_history):
-        scenario_history.end_execution_time = datetime.now()
-        scenario_history.save()
-
-    def execute(self):
-
-        scenario_history = ScenarioHistory.objects.create(
+        self.scenario_history = ScenarioHistory.objects.create(
             name=self.scenario.name,
             user=self.user,
             scenario=self.scenario,
             collection=self.scenario.collection,
             schedule=str(self.scenario.schedule.periodic_task)
         )
-        scenario_history.save()
+        self.scenario_history.save()
+
+    def finish(self):
+        self.scenario_history.end_execution_time = datetime.now()
+        self.scenario_history.save()
+
+    def execute(self):
+        self.scenario_history.status = ScenarioHistory.PROGRESS
+        self.scenario_history.save()
 
         start = self.scenario.starter_module
         stack = [start]
@@ -33,19 +34,21 @@ class ScenarioExecution:
             request = module.request
             try:
                 RequestExecution(request=request, user=self.user, module=module,
-                                 scenario_history=scenario_history).execute()
+                                 scenario_history=self.scenario_history).execute()
             except Exception:
-                self.finish(scenario_history=scenario_history)
+                self.scenario_history.status = ScenarioHistory.FAILED
+                self.finish()
                 return
 
             edges = Edge.objects.all().filter(source=module)
             for e in edges:
-                if EdgeManager(e, scenario_history).check():
+                if EdgeManager(e, self.scenario_history).check():
                     stack.append(e.dist)
 
-        self.finish(scenario_history=scenario_history)
+        self.scenario_history.status = ScenarioHistory.COMPLETED
+        self.finish()
 
-        print(f'end time {scenario_history.end_execution_time}, ',
-              f'start time : {scenario_history.start_request_time}')
+        print(f'end time {self.scenario_history.end_execution_time}, ',
+              f'start time : {self.scenario_history.start_execution_time}')
 
         return
