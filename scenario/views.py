@@ -74,32 +74,7 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
             Q(collection__usercollection__user=self.request.user)
         ).distinct().order_by('-start_execution_time')
 
-    def retrieve(self, request, *args, **kwargs):
-        scenario_histories = get_list_or_404(self.get_queryset(), scenario__id=kwargs.get('pk'))
-        serializer = self.get_serializer(scenario_histories, many=True)
-        return Response(serializer.data)
-
-    def list_with_collection(self, request, collection_id):
-        scenario_histories = get_list_or_404(self.get_queryset(), collection__id=collection_id)
-
-        page = self.request.query_params.get('page')
-        if page is None:
-            page = 1
-        page = int(page)
-        limit = self.request.query_params.get('limit')
-        if limit is None:
-            limit = 10
-        limit = int(limit)
-
-        paginator = Paginator(scenario_histories, limit)
-        if paginator.num_pages < page:
-            return Response({'msg': 'finished'}, status=status.HTTP_404_NOT_FOUND)
-
-        return JsonResponse(self.get_serializer(paginator.get_page(page), many=True).data,
-                            safe=False, status=status.HTTP_200_OK)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+    def get_paginated_response(self, queryset):
 
         page = self.request.query_params.get('page')
         if page is None:
@@ -112,9 +87,25 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
 
         paginator = Paginator(queryset, limit)
         if paginator.num_pages < page:
-            return Response({'msg': 'finished'}, status=status.HTTP_404_NOT_FOUND)
+            return []
+        return paginator.get_page(page)
 
-        serializer = self.get_serializer(paginator.get_page(page), many=True)
+    def retrieve(self, request, *args, **kwargs):
+        scenario_histories = get_list_or_404(self.get_queryset(), scenario__id=kwargs.get('pk'))
+        response = self.get_paginated_response(scenario_histories)
+        serializer = self.get_serializer(response, many=True)
+        return Response(serializer.data)
+
+    def list_with_collection(self, request, collection_id):
+        scenario_histories = get_list_or_404(self.get_queryset(), collection__id=collection_id)
+        response = self.get_paginated_response(scenario_histories)
+        serializer = self.get_serializer(response, many=True)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        scenario_histories = self.filter_queryset(self.get_queryset())
+        response = self.get_paginated_response(scenario_histories)
+        serializer = self.get_serializer(response, many=True)
         return Response(serializer.data)
 
 
