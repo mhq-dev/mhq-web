@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django_celery_beat.models import IntervalSchedule, ClockedSchedule, CrontabSchedule
 from rest_framework.response import Response
@@ -71,19 +72,41 @@ class ScenarioHistoryViewSet(viewsets.ModelViewSet):
         return ScenarioHistory.objects.all().filter(
             Q(collection__isnull=False) &
             Q(collection__usercollection__user=self.request.user)
-        ).distinct()
+        ).distinct().order_by('-start_execution_time')
+
+    def get_paginated_response(self, queryset):
+
+        page = self.request.query_params.get('page')
+        if page is None:
+            page = 1
+        page = int(page)
+        limit = self.request.query_params.get('limit')
+        if limit is None:
+            limit = 10
+        limit = int(limit)
+
+        paginator = Paginator(queryset, limit)
+        if paginator.num_pages < page:
+            return []
+        return paginator.get_page(page)
 
     def retrieve(self, request, *args, **kwargs):
         scenario_histories = get_list_or_404(self.get_queryset(), scenario__id=kwargs.get('pk'))
-        serializer = self.get_serializer(scenario_histories, many=True)
+        response = self.get_paginated_response(scenario_histories)
+        serializer = self.get_serializer(response, many=True)
         return Response(serializer.data)
 
     def list_with_collection(self, request, collection_id):
         scenario_histories = get_list_or_404(self.get_queryset(), collection__id=collection_id)
-        return JsonResponse(self.get_serializer(scenario_histories, many=True).data,
-                            safe=False, status=status.HTTP_200_OK)
+        response = self.get_paginated_response(scenario_histories)
+        serializer = self.get_serializer(response, many=True)
+        return Response(serializer.data)
 
-    # TODO all request histories for a scenario history
+    def list(self, request, *args, **kwargs):
+        scenario_histories = self.filter_queryset(self.get_queryset())
+        response = self.get_paginated_response(scenario_histories)
+        serializer = self.get_serializer(response, many=True)
+        return Response(serializer.data)
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

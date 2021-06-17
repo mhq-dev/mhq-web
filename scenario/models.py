@@ -2,9 +2,10 @@ import json
 
 from django.db import models
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
-from datetime import datetime
+
 from edge.models import Edge
 from module.models import Module
+from request.models import RequestHistory
 
 
 class Scenario(models.Model):
@@ -70,13 +71,22 @@ class ScenarioSchedule(models.Model):
 
 
 class ScenarioHistory(models.Model):
+    COMPLETED = 'completed'
+    PENDING = 'pending'
+    PROGRESS = 'progress'
+    FAILED = 'failed'
+
     name = models.CharField(max_length=250)
     user = models.ForeignKey('authentication.User', null=True, on_delete=models.SET_NULL)
     scenario = models.ForeignKey(Scenario, null=True, on_delete=models.SET_NULL)
     collection = models.ForeignKey('collection.Collection', null=True, on_delete=models.SET_NULL)
-    start_request_time = models.DateTimeField(auto_now_add=True, blank=True)
+    start_execution_time = models.DateTimeField(auto_now_add=True, blank=True)
     end_execution_time = models.DateTimeField(default=None, blank=True, null=True)
     schedule = models.CharField(default=ScenarioSchedule.ONCE, max_length=200, null=True)
+    status = models.CharField(max_length=200, default=PENDING, blank=True)
+
+    def get_request_histories(self):
+        return RequestHistory.objects.all().filter(scenario_history=self)
 
     class Meta:
         db_table = 'scenario_history'
