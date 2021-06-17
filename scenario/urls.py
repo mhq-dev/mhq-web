@@ -8,6 +8,7 @@ urlpatterns = [
     path('<int:pk>/schedule/', viewsets.scenario_schedule),
     path('<int:pk>/execute/', viewsets.execute),
     path('<int:pk>/history/', viewsets.scenario_history),
+    path('history/<int:scenario_history_id>/', viewsets.scenario_history_with_id),
     path('collection/<int:collection_id>/history/', viewsets.scenario_collection_history),
     path('history/', viewsets.scenario_history_list)
 ]
