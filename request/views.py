@@ -5,7 +5,7 @@ from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from .managers import BadRequestException
 from request.managers import RequestExecution
 from collection.models import Collection
 from request.models import Request, RequestHistory
@@ -22,7 +22,7 @@ def get_key_value_dict(key_values):
 
 class RequestViewSet(viewsets.ModelViewSet):
     serializer_class = RequestFullSerializer
-    permission_classes = [RequestPermission, ]
+    permission_classes = [RequestPermission, IsAuthenticated, ]
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
@@ -47,8 +47,8 @@ class RequestViewSet(viewsets.ModelViewSet):
 
         try:
             response = RequestExecution(request=mhq_request, user=request.user).execute()
-        except:
-            return Response({"msg": "Error: Could not send request"}, status=status.HTTP_400_BAD_REQUEST)
+        except BadRequestException as e:
+            return Response({"msg": f'Error: {e.message}'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(response, status=status.HTTP_200_OK)
 
