@@ -252,9 +252,6 @@ class RequestViewSetTestCase(APITestCase):
         self.assertEqual(len(self.req2.get_headers()), 1)
 
     def test_execute_request(self):
-        # public collection
-        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req6.id}))
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # logged in & ok
         self.client.force_login(self.user)

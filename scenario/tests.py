@@ -41,7 +41,7 @@ class RequestViewSetTestCase(APITestCase):
         self.scenario1.starter_module = self.module1
         self.scenario1.save()
 
-    def test_execute_scenario_(self):
+    def test_execute_scenario(self):
         response = self.client.get(reverse('scenario-execute', kwargs={'pk': self.scenario1.id}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 

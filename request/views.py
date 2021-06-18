@@ -22,7 +22,7 @@ def get_key_value_dict(key_values):
 
 class RequestViewSet(viewsets.ModelViewSet):
     serializer_class = RequestFullSerializer
-    permission_classes = [RequestPermission, IsAuthenticated, ]
+    permission_classes = [RequestPermission, ]
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
