@@ -18,7 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 
 class ScenarioViewSets(viewsets.ModelViewSet):
     serializer_class = ScenarioSerializer
-    permission_classes = [ScenarioPermission, ]
+    permission_classes = [ScenarioPermission, IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
@@ -57,7 +57,7 @@ class ScenarioViewSets(viewsets.ModelViewSet):
             user=request.user,
             scenario=scenario,
             collection=scenario.collection,
-            schedule=str(scenario.schedule.periodic_task)
+            schedule=str(scenario.schedule.periodic_task) if scenario.schedule is not None else None
         )
         scenario_history.save()
 
