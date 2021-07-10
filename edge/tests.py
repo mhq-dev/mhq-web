@@ -87,7 +87,7 @@ class EdgeViewSetTestCase(APITestCase):
                             'second': 'hi'
                         },
                         {
-                            'operator': 'exist',
+                            'operator': Condition.EXIST,
                             'first': 'hi',
                             'second': 'bye'
                         }
@@ -127,7 +127,7 @@ class EdgeViewSetTestCase(APITestCase):
                             'second': 'hi'
                         },
                         {
-                            'operator': 'exist',
+                            'operator': Condition.EXIST,
                             'first': 'hi',
                             'second': 'bye'
                         }
@@ -205,27 +205,44 @@ class EdgeManagerTestCase(APITestCase):
         self.condition3.first = 'bye'
         self.condition3.save()
         self.assertEqual(EdgeManager(self.edge1).check(), False)
-        self.condition1.operator = 'start_with'
+        self.condition1.operator = Condition.START_WITH
         self.condition1.save()
         self.assertEqual(EdgeManager(self.edge1).check(), False)
         self.condition1.second = 'by'
         self.condition1.save()
         self.assertEqual(EdgeManager(self.edge1).check(), True)
-        self.condition1.operator = 'contains'
+        self.condition1.operator = Condition.CONTAINS
         self.condition1.save()
         self.assertEqual(EdgeManager(self.edge1).check(), True)
         self.condition1.first = 'yyyyybbbb'
         self.condition1.save()
         self.assertEqual(EdgeManager(self.edge1).check(), False)
-        self.condition1.first_token = 'num'
+        self.condition1.first_token = Condition.NUM
         self.condition1.first = 12
-        self.condition1.second_token = 'num'
+        self.condition1.second_token = Condition.NUM
         self.condition1.second = 12
         self.condition1.save()
         self.assertEqual(EdgeManager(self.edge1).check(), True)
         self.condition1.first = 13
         self.condition1.save()
         self.assertEqual(EdgeManager(self.edge1).check(), False)
+        self.condition1.first = 200
+        self.condition1.second_token = Condition.STATUS_CODE
+        self.condition1.second = None
+        self.condition1.save()
+        self.assertEqual(EdgeManager(edge=self.edge1, parent_response={'status': 200}).check(), True)
+        self.assertEqual(EdgeManager(edge=self.edge1, parent_response={'status': 400}).check(), False)
+        self.condition1.second_token = Condition.BODY
+        self.condition1.second = 'my.status_code'
+        self.condition1.save()
+        self.assertEqual(EdgeManager(edge=self.edge1, parent_response={
+            'body': {'my': {'status_code': 200}}
+        }).check(), True)
+        self.assertEqual(EdgeManager(edge=self.edge1, parent_response={
+            'body': {'my': {'status_code': 400}}
+        }).check(), False)
+        self.assertEqual(EdgeManager(edge=self.edge1, parent_response={'body': {'my': 200}}).check(), False)
+        self.assertEqual(EdgeManager(edge=self.edge1, parent_response={'body': 200}).check(), False)
         self.condition1.delete()
         self.condition2.delete()
         self.assertEqual(EdgeManager(self.edge1).check(), True)

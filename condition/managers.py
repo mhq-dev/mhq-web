@@ -18,13 +18,16 @@ class ConditionManager:
         datetime.datetime.strptime(t, "%d/%m/%Y")
 
     def body(self, q):
-        bq_list = str(q).split('.')
-        body = self.parent_response['body']
-        result = body
-        for bq in bq_list:
-            result = result[bq]
+        try:
+            bq_list = str(q).split('.')
+            body = self.parent_response['body']
+            result = body
+            for bq in bq_list:
+                result = result[bq]
 
-        return result
+            return result
+        except Exception as e:
+            return None
 
     def status_code(self, nothing):
         return int(self.parent_response['status'])
