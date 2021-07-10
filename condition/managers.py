@@ -4,8 +4,9 @@ from condition.models import Condition
 
 
 class ConditionManager:
-    def __init__(self, condition_id):
+    def __init__(self, condition_id, parent_response):
         self.condition = Condition.objects.get(id=condition_id)
+        self.parent_response = parent_response
 
     def str(self, s):
         return str(s)
@@ -16,17 +17,23 @@ class ConditionManager:
     def timestamp(self, t):
         datetime.datetime.strptime(t, "%d/%m/%Y")
 
-    def body(self, b):
-        pass
+    def body(self, q):
+        bq_list = str(q).split('.')
+        body = self.parent_response['body']
+        result = body
+        for bq in bq_list:
+            result = result[bq]
 
-    def status_code(self, sc):
-        pass
+        return result
+
+    def status_code(self, nothing):
+        return int(self.parent_response['status'])
 
     def equal(self, var1, var2):
         return var1 == var2
 
-    def exist(self, var1, nothing):
-        pass
+    def exist(self, var1, var2):
+        return var1 in var2
 
     def start_with(self, var1, var2):
         return str(var1).startswith(str(var2))

@@ -2,9 +2,10 @@ from condition.managers import ConditionManager
 
 
 class EdgeManager:
-    def __init__(self, edge, scenario_history=None):
+    def __init__(self, edge, scenario_history=None, parent_response=None):
         self.edge = edge
         self.scenario_history = scenario_history
+        self.parent_response = parent_response
 
     def check(self):
         statements = self.edge.get_statements()
@@ -23,6 +24,6 @@ class EdgeManager:
 
         result = True
         for condition in conditions:
-            result = result and ConditionManager(condition.id).check()
+            result = result and ConditionManager(condition.id, self.parent_response).check()
 
         return result
