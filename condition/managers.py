@@ -18,16 +18,13 @@ class ConditionManager:
         datetime.datetime.strptime(t, "%d/%m/%Y")
 
     def body(self, q):
-        try:
-            bq_list = str(q).split('.')
-            body = self.parent_response['body']
-            result = body
-            for bq in bq_list:
-                result = result[bq]
+        bq_list = str(q).split('.')
+        body = self.parent_response['body']
+        result = body
+        for bq in bq_list:
+            result = result[bq]
 
-            return result
-        except Exception as e:
-            return None
+        return result
 
     def status_code(self, nothing):
         return int(self.parent_response['status'])
@@ -52,7 +49,10 @@ class ConditionManager:
         condition_types = {Condition.EQUAL: self.equal, Condition.EXIST: self.exist,
                            Condition.START_WITH: self.start_with, Condition.CONTAINS: self.contains}
 
-        var1 = token_types[self.condition.first_token](self.condition.first)
-        var2 = token_types[self.condition.second_token](self.condition.second)
+        try:
+            var1 = token_types[self.condition.first_token](self.condition.first)
+            var2 = token_types[self.condition.second_token](self.condition.second)
 
-        return condition_types[self.condition.operator](var1, var2)
+            return condition_types[self.condition.operator](var1, var2)
+        except:
+            return False
