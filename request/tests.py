@@ -18,38 +18,65 @@ class RequestViewSetTestCase(APITestCase):
         self.generate_basic_database()
 
     def generate_basic_database(self):
+        # collection 1
         self.col1 = Collection.objects.create(type='private', name='col1')
         UserCollection.objects.create(user=self.user, collection=self.col1, role=UserCollection.OWNER)
         self.req1 = Request.objects.create(collection=self.col1, name='req1', http_method=Request.GET, url='req1.com')
         KeyValueContainer.objects.create(request=self.req1, type=KeyValueContainer.HEADER, key='kvc1', value='kvc1-val')
         KeyValueContainer.objects.create(request=self.req1, type=KeyValueContainer.PARAM, key='kvc2', value='kvc2-val')
         KeyValueContainer.objects.create(request=self.req1, type=KeyValueContainer.PARAM, key='kvc3', value='kvc3-val')
+
+        # collection2
         self.col2 = Collection.objects.create(type='private', name='col2')
         UserCollection.objects.create(user=self.user, collection=self.col2, role=UserCollection.EDITOR)
         self.req2 = Request.objects.create(collection=self.col2, name='req2', http_method=Request.GET, url='req2.com')
         KeyValueContainer.objects.create(request=self.req2, type=KeyValueContainer.HEADER, key='kvc1', value='kvc1-val')
         KeyValueContainer.objects.create(request=self.req2, type=KeyValueContainer.PARAM, key='kvc2', value='kvc2-val')
         KeyValueContainer.objects.create(request=self.req2, type=KeyValueContainer.PARAM, key='kvc3', value='kvc3-val')
+
+        # collection3
         self.col3 = Collection.objects.create(type='private', name='col3')
         UserCollection.objects.create(user=self.user, collection=self.col3, role=UserCollection.VISITOR)
         self.req3 = Request.objects.create(collection=self.col3, name='req3', http_method=Request.GET, url='req3.com')
         KeyValueContainer.objects.create(request=self.req3, type=KeyValueContainer.HEADER, key='kvc1', value='kvc1-val')
         KeyValueContainer.objects.create(request=self.req3, type=KeyValueContainer.PARAM, key='kvc2', value='kvc2-val')
         KeyValueContainer.objects.create(request=self.req3, type=KeyValueContainer.PARAM, key='kvc3', value='kvc3-val')
+
+        # collection4
         self.col4 = Collection.objects.create(type='public', name='col4')
         self.req4 = Request.objects.create(collection=self.col4, name='req4', http_method=Request.GET, url='req4.com')
         KeyValueContainer.objects.create(request=self.req4, type=KeyValueContainer.HEADER, key='kvc1', value='kvc1-val')
         KeyValueContainer.objects.create(request=self.req4, type=KeyValueContainer.PARAM, key='kvc2', value='kvc2-val')
         KeyValueContainer.objects.create(request=self.req4, type=KeyValueContainer.PARAM, key='kvc3', value='kvc3-val')
+
+        # private collection5
         self.col5 = Collection.objects.create(type='private', name='col5')
         self.req5 = Request.objects.create(collection=self.col5, name='req5', http_method=Request.GET, url='req5.com')
         KeyValueContainer.objects.create(request=self.req5, type=KeyValueContainer.HEADER, key='kvc1', value='kvc1-val')
         KeyValueContainer.objects.create(request=self.req5, type=KeyValueContainer.PARAM, key='kvc2', value='kvc2-val')
         KeyValueContainer.objects.create(request=self.req5, type=KeyValueContainer.PARAM, key='kvc3', value='kvc3-val')
-        self.req6 = Request.objects.create(collection=self.col1,
-                                           name='get-collection-list-req',
+
+        self.col6 = Collection.objects.create(name='col6', type='public')
+        self.req6 = Request.objects.create(collection=self.col6,
+                                           name='name1',
+                                           http_method=Request.POST,
+                                           url='https://60c1f3514f7e880017dc0e65.mockapi.io/scenario')
+
+        self.req7 = Request.objects.create(collection=self.col6,
+                                           name='name2',
+                                           http_method=Request.POST,
+                                           url='https://60c1f3514f7e880017dc0e65rsaasasas.mockapi.io/scenario')
+
+        self.req8 = Request.objects.create(collection=self.col6,
+                                           name='name3',
+                                           http_method='ddd',
+                                           url='https://60c1f3514f7e880017dc0e65.mockapi.io/scenario')
+
+        self.col7 = Collection.objects.create(name='col7', type='private')
+        self.req9 = Request.objects.create(collection=self.col7,
+                                           name='name4',
                                            http_method=Request.GET,
-                                           url='https://6094a286f082a4001736b248.mockapi.io/api/furit')
+                                           url='https://60c1f3514f7e880017dc0e65.mockapi.io/scenario')
 
     def test_request_list(self):
         response = self.client.get(reverse('request-list', kwargs={'collection_id': self.col1.id}))
@@ -225,10 +252,42 @@ class RequestViewSetTestCase(APITestCase):
         self.assertEqual(len(self.req2.get_headers()), 1)
 
     def test_execute_request(self):
-        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req6.id}))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.client.force_login(user=self.user)
+
+        # logged in & ok
+        self.client.force_login(self.user)
         response = self.client.get(reverse('request-execute', kwargs={'pk': self.req6.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(int(response.json()['status']), status.HTTP_200_OK)
-        self.assertEqual(len(response.json()['body']), 3)
+
+        # # logged in & wrong url
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req7.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('status'), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        #
+        # # logged in wrong http_method
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req8.id}))
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # # not exist request
+        response = self.client.get(reverse('request-execute', kwargs={'pk': 88}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # private collection
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req9.id}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        #
+        user_col = UserCollection.objects.create(collection=self.col7, user=self.user, role=UserCollection.VISITOR)
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req9.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        #
+        user_col.role = UserCollection.EDITOR
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req9.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        #
+        user_col.role = UserCollection.OWNER
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req9.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(reverse('request-execute', kwargs={'pk': self.req9.id}))
+        KeyValueContainer.objects.create(request=self.req9, type=KeyValueContainer.HEADER, key='key1', value='Hello')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('status'), status.HTTP_200_OK)

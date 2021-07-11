@@ -37,9 +37,10 @@ class ScenarioExecution:
         while len(stack) > 0:
             module = stack.pop()
             request = module.request
+            response = None
             try:
-                RequestExecution(request=request, user=self.user, module=module,
-                                 scenario_history=self.scenario_history).execute()
+                response = RequestExecution(request=request, user=self.user, module=module,
+                                            scenario_history=self.scenario_history).execute()
             except Exception:
                 self.scenario_history.status = ScenarioHistory.FAILED
                 self.finish()
@@ -47,7 +48,7 @@ class ScenarioExecution:
 
             edges = Edge.objects.all().filter(source=module)
             for e in edges:
-                if EdgeManager(e, self.scenario_history).check():
+                if EdgeManager(e, self.scenario_history, response).check():
                     stack.append(e.dist)
 
         self.scenario_history.status = ScenarioHistory.COMPLETED
